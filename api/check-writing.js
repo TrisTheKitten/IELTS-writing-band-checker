@@ -11,7 +11,7 @@ import {
 } from "../shared/ielts-contract.js";
 
 const GEMINI_API_VERSION = "v1beta";
-const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-preview";
 const GEMINI_API_KEY_HEADER = "x-gemini-api-key";
 const GEMINI_ENDPOINT_BASE = "https://generativelanguage.googleapis.com";
 const HTTP_METHOD = "POST";

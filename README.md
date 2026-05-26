@@ -45,7 +45,7 @@ See [Environment variables](#environment-variables) for optional settings.
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `GEMINI_API_KEY` | Yes* | — | Server fallback Gemini API key |
-| `GEMINI_MODEL` | No | `gemini-2.0-flash` | Gemini model ID for scoring requests |
+| `GEMINI_MODEL` | No | `gemini-3.1-flash-preview` | Gemini model ID for scoring requests |
 
 \*Not required on the server if every user supplies their own key via **Settings** in the app.
 
