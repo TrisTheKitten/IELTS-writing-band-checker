@@ -1,6 +1,6 @@
 # IELTS Writing Band Checker
 
-Non-commercial, open-source IELTS Writing score checker inspired by [Lexibot](https://github.com/lexibot). Paste or upload a prompt, submit your answer, and get estimated band scores with criteria feedback, corrections, and vocabulary suggestions.
+Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Paste or upload a prompt, submit your answer, and get estimated band scores with criteria feedback, corrections, and vocabulary suggestions.
 
 ## Features
 
