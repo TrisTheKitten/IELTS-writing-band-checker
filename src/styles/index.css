@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@import "./tokens.css";
+@import "./base.css";
+@import "./checker.css";
+@import "./tooltip.css";
+@import "./analysis.css";
+@import "./animations.css";
