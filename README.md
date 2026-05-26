@@ -2,6 +2,8 @@
 
 Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Paste or upload a prompt, submit your answer, and get estimated band scores with criteria feedback, corrections, and vocabulary suggestions.
 
+Try here (BYOK) : https://ielts-writing-band-checker.vercel.app/
+
 ## Features
 
 - **Task types:** Writing Task 2, Task 1 (Academic), and Task 1 (General)
