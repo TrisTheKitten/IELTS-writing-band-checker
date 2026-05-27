@@ -25,11 +25,70 @@ export function isTask1(taskType) {
   return TASK_1_PATTERN.test(String(taskType || ""));
 }
 
+export function isTask1Academic(taskType) {
+  return String(taskType || "").includes("(Academic)");
+}
+
+export function isTask2(taskType) {
+  return !isTask1(taskType);
+}
+
 export const QUESTION_IMAGE_ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 export const MAX_QUESTION_IMAGE_BYTES = 4 * 1024 * 1024;
 export const ACCEPTED_QUESTION_IMAGE_MIME_TYPES = new Set(
   QUESTION_IMAGE_ACCEPT.split(",")
 );
+
+export const EXAM_DURATION_MS = {
+  task2: 40 * 60 * 1000,
+  task1: 20 * 60 * 1000
+};
+
+export const WORD_BAND_LEVELS = ["red", "amber", "green"];
+
+export const WORD_BAND_THRESHOLDS = {
+  task2: [
+    { max: 239, level: "red", label: "Well under length" },
+    { max: 249, level: "amber", label: "Almost at minimum" },
+    { max: 320, level: "green", label: "Good length" },
+    { max: 380, level: "amber", label: "Getting long" },
+    { max: Infinity, level: "red", label: "Too long" }
+  ],
+  task1: [
+    { max: 139, level: "red", label: "Well under length" },
+    { max: 149, level: "amber", label: "Almost at minimum" },
+    { max: 200, level: "green", label: "Good length" },
+    { max: 250, level: "amber", label: "Getting long" },
+    { max: Infinity, level: "red", label: "Too long" }
+  ]
+};
+
+export const TASK1_CHECKLIST_ACADEMIC_ITEMS = [
+  { id: "overview", prompt: "overview paragraph present and accurate" },
+  { id: "trendsCompared", prompt: "key trends or stages are compared with data" },
+  { id: "noOpinion", prompt: "no personal opinion or speculation beyond the data" }
+];
+
+export const TASK1_CHECKLIST_GENERAL_ITEMS = [
+  { id: "purposeClear", prompt: "purpose of the letter is clear in the opening" },
+  {
+    id: "toneAppropriate",
+    prompt: "tone matches the situation (formal/semi-formal as required)"
+  },
+  { id: "bulletsAddressed", prompt: "every bullet point in the prompt is covered" },
+  { id: "closingFit", prompt: "closing and sign-off fit the situation" }
+];
+
+export const TASK1_CHECKLIST_ACADEMIC_IDS = TASK1_CHECKLIST_ACADEMIC_ITEMS.map((item) => item.id);
+
+export const TASK1_CHECKLIST_GENERAL_IDS = TASK1_CHECKLIST_GENERAL_ITEMS.map((item) => item.id);
+
+export const STRUCTURE_COACH_SECTIONS = [
+  "Introduction",
+  "Body1",
+  "Body2",
+  "Conclusion"
+];
 
 export const FEATURE_FLAGS = [
   {
@@ -46,10 +105,26 @@ export const FEATURE_FLAGS = [
     id: "detailedFeedback",
     label: "Criteria breakdown",
     description: "Notes and bullet points for Task response, Coherence, Lexical resource, and Grammar."
+  },
+  {
+    id: "task1Checklist",
+    label: "Task 1 checklist",
+    description: "Diagnostic checklist for Task 1 (overview, trends, or letter requirements)."
+  },
+  {
+    id: "structureCoach",
+    label: "Essay structure",
+    description: "Diagnostic checklist for Task 2 intro, body paragraphs, and conclusion."
   }
 ];
 
 export const FEATURE_FLAG_IDS = FEATURE_FLAGS.map((flag) => flag.id);
+
+export const TASK_BOUND_FEATURE_FLAG_IDS = ["task1Checklist", "structureCoach"];
+
+export const USER_TOGGLEABLE_FEATURE_FLAGS = FEATURE_FLAGS.filter(
+  (flag) => !TASK_BOUND_FEATURE_FLAG_IDS.includes(flag.id)
+);
 
 export const DEFAULT_FEEDBACK_LANGUAGE = "English (UK)";
 
@@ -63,8 +138,58 @@ export function parseFeatureFlags(input) {
   return input.filter((flag) => FEATURE_FLAG_ID_SET.has(flag));
 }
 
+export function getTaskBoundFeatureFlag(taskType) {
+  return isTask1(taskType) ? "task1Checklist" : "structureCoach";
+}
+
+export function getEffectiveFeatureFlags(taskType, selectedFlags) {
+  const userFlags = parseFeatureFlags(selectedFlags).filter(
+    (flag) => !TASK_BOUND_FEATURE_FLAG_IDS.includes(flag)
+  );
+
+  return [...userFlags, getTaskBoundFeatureFlag(taskType)];
+}
+
 export function isFeatureEnabled(flags, flagId) {
   return parseFeatureFlags(flags).includes(flagId);
+}
+
+export function getWordBandThresholds(taskType) {
+  return isTask1(taskType) ? WORD_BAND_THRESHOLDS.task1 : WORD_BAND_THRESHOLDS.task2;
+}
+
+export function getWordBandStatus(taskType, wordCount) {
+  const count = Number(wordCount);
+
+  if (!Number.isFinite(count) || count < 0) {
+    return { level: "red", label: "Well under length", wordCountOk: false };
+  }
+
+  const thresholds = getWordBandThresholds(taskType);
+  const match =
+    thresholds.find((band) => count <= band.max) || thresholds[thresholds.length - 1];
+
+  return {
+    level: match.level,
+    label: match.label,
+    wordCountOk: match.level === "green"
+  };
+}
+
+export function buildTask1ChecklistPromptLines(taskType) {
+  if (!isTask1(taskType)) {
+    return [];
+  }
+
+  const items = isTask1Academic(taskType)
+    ? TASK1_CHECKLIST_ACADEMIC_ITEMS
+    : TASK1_CHECKLIST_GENERAL_ITEMS;
+
+  return [
+    "Return task1Checklist as an array with exactly these items (id, label, met boolean, short note):",
+    ...items.map((item) => `${item.id} — ${item.prompt};`),
+    "Do not include word count; the app handles that separately."
+  ];
 }
 
 export function featureFlagLabel(flagId) {

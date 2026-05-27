@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { buildResponseSchema } from "../../api/check-writing.js";
-import { getSubmitBlockReason, normalizeResult, normalizeScore } from "./scoring.js";
+import {
+  getSubmitBlockReason,
+  getSubmitState,
+  normalizeResult,
+  normalizeScore
+} from "./scoring.js";
 
 const samplePayload = {
   overall: 6.7,
@@ -43,7 +48,34 @@ describe("normalizeResult", () => {
     expect(result.criteria).toEqual([]);
     expect(result.corrections).toEqual([]);
     expect(result.improvedVocabulary).toEqual([]);
+    expect(result.task1Checklist).toEqual([]);
+    expect(result.structureCoach).toBeNull();
     expect(result.overall).toBe(6.5);
+  });
+
+  it("keeps task1 checklist and structure coach when flags are on", () => {
+    const payload = {
+      ...samplePayload,
+      task1Checklist: [{ id: "overview", label: "Overview", met: true, note: "Clear" }],
+      structureCoach: {
+        sections: [{ name: "Introduction", met: true, note: "Clear position" }]
+      }
+    };
+
+    const result = normalizeResult(payload, ["task1Checklist", "structureCoach"]);
+
+    expect(result.task1Checklist[0]).toEqual({
+      id: "overview",
+      label: "Overview",
+      met: true,
+      note: "Clear"
+    });
+    expect(result.structureCoach.sections[0]).toEqual({
+      id: "Introduction",
+      label: "Introduction",
+      met: true,
+      note: "Clear position"
+    });
   });
 
   it("keeps only word-choice sections when that flag is on", () => {
@@ -56,26 +88,44 @@ describe("normalizeResult", () => {
   });
 });
 
-describe("getSubmitBlockReason", () => {
+describe("getSubmitState", () => {
   it("blocks short essays and missing task 1 images", () => {
-    expect(
-      getSubmitBlockReason({
-        essay: "short",
-        taskType: "IELTS Writing Task 2",
-        questionImage: null,
-        isChecking: false
-      })
-    ).toMatch(/at least/);
+    const shortEssay = getSubmitState({
+      essay: "short",
+      taskType: "IELTS Writing Task 2",
+      questionImage: null,
+      isChecking: false
+    });
 
-    expect(
-      getSubmitBlockReason({
-        essay: "x".repeat(150),
-        taskType: "IELTS Writing Task 1 (Academic)",
-        questionImage: null,
-        isChecking: false
-      })
-    ).toMatch(/question image/);
+    expect(shortEssay.canSubmit).toBe(false);
+    expect(shortEssay.blockReason).toMatch(/at least/);
+    expect(shortEssay.showMinLengthHint).toBe(true);
 
+    const missingImage = getSubmitState({
+      essay: "x".repeat(150),
+      taskType: "IELTS Writing Task 1 (Academic)",
+      questionImage: null,
+      isChecking: false
+    });
+
+    expect(missingImage.canSubmit).toBe(false);
+    expect(missingImage.blockReason).toMatch(/question image/);
+    expect(missingImage.showTask1ImageHint).toBe(true);
+
+    const ready = getSubmitState({
+      essay: "x".repeat(150),
+      taskType: "IELTS Writing Task 2",
+      questionImage: null,
+      isChecking: false
+    });
+
+    expect(ready.canSubmit).toBe(true);
+    expect(ready.blockReason).toBeNull();
+  });
+});
+
+describe("getSubmitBlockReason", () => {
+  it("returns blockReason from getSubmitState", () => {
     expect(
       getSubmitBlockReason({
         essay: "x".repeat(150),
@@ -108,5 +158,27 @@ describe("buildResponseSchema", () => {
     expect(schema.required).toContain("criteria");
     expect(schema.required).toContain("corrections");
     expect(schema.required).toContain("improvedVocabulary");
+  });
+
+  it("adds task1 checklist only for task 1", () => {
+    const task1Schema = buildResponseSchema(
+      ["task1Checklist"],
+      "IELTS Writing Task 1 (Academic)"
+    );
+    expect(task1Schema.required).toContain("task1Checklist");
+
+    const task2Schema = buildResponseSchema(["task1Checklist"], "IELTS Writing Task 2");
+    expect(task2Schema.properties.task1Checklist).toBeUndefined();
+  });
+
+  it("adds structure coach only for task 2", () => {
+    const task2Schema = buildResponseSchema(["structureCoach"], "IELTS Writing Task 2");
+    expect(task2Schema.required).toContain("structureCoach");
+
+    const task1Schema = buildResponseSchema(
+      ["structureCoach"],
+      "IELTS Writing Task 1 (General)"
+    );
+    expect(task1Schema.properties.structureCoach).toBeUndefined();
   });
 });

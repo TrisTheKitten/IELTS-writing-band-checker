@@ -1,13 +1,17 @@
 import {
+  buildTask1ChecklistPromptLines,
   DEFAULT_FEEDBACK_LANGUAGE,
   enabledFeatureLabels,
   isTask1,
+  isTask2,
   MAX_ESSAY_LENGTH,
   MAX_PROMPT_LENGTH,
   MIN_ESSAY_LENGTH,
   normalizeQuestionImage,
   parseFeatureFlags,
-  isFeatureEnabled
+  isFeatureEnabled,
+  STRUCTURE_COACH_SECTIONS,
+  TASK_TYPES
 } from "../shared/ielts-contract.js";
 
 const GEMINI_API_VERSION = "v1beta";
@@ -68,7 +72,28 @@ const CORE_SCORE_REQUIRED = [
   "grammarAccuracy"
 ];
 
-export function buildResponseSchema(featureFlags) {
+const TASK1_CHECKLIST_ITEM_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    id: { type: "STRING" },
+    label: { type: "STRING" },
+    met: { type: "BOOLEAN" },
+    note: { type: "STRING" }
+  },
+  required: ["id", "label", "met", "note"]
+};
+
+const STRUCTURE_COACH_SECTION_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    name: { type: "STRING" },
+    met: { type: "BOOLEAN" },
+    note: { type: "STRING" }
+  },
+  required: ["name", "met", "note"]
+};
+
+export function buildResponseSchema(featureFlags, taskType = TASK_TYPES[0]) {
   const flags = parseFeatureFlags(featureFlags);
   const properties = { ...CORE_SCORE_PROPERTIES };
   const required = [...CORE_SCORE_REQUIRED];
@@ -96,6 +121,28 @@ export function buildResponseSchema(featureFlags) {
       items: VOCABULARY_ITEM_SCHEMA
     };
     required.push("corrections", "improvedVocabulary");
+  }
+
+  if (isFeatureEnabled(flags, "task1Checklist") && isTask1(taskType)) {
+    properties.task1Checklist = {
+      type: "ARRAY",
+      items: TASK1_CHECKLIST_ITEM_SCHEMA
+    };
+    required.push("task1Checklist");
+  }
+
+  if (isFeatureEnabled(flags, "structureCoach") && isTask2(taskType)) {
+    properties.structureCoach = {
+      type: "OBJECT",
+      properties: {
+        sections: {
+          type: "ARRAY",
+          items: STRUCTURE_COACH_SECTION_SCHEMA
+        }
+      },
+      required: ["sections"]
+    };
+    required.push("structureCoach");
   }
 
   return {
@@ -161,7 +208,7 @@ export default async function handler(request, response) {
         temperature: TEMPERATURE,
         maxOutputTokens: RESPONSE_TOKEN_LIMIT,
         responseMimeType: "application/json",
-        responseSchema: buildResponseSchema(featureFlags)
+        responseSchema: buildResponseSchema(featureFlags, taskType)
       }
     })
   });
@@ -239,6 +286,19 @@ export function buildPrompt({ essay, topic, taskType, aiLanguage, featureFlags, 
       "List specific grammar fixes in corrections (original phrase, revised phrase, reason).",
       "List lexical upgrades in improvedVocabulary (original word or phrase, stronger suggestion, reason).",
       "Do not rewrite the full essay."
+    );
+  }
+
+  if (isFeatureEnabled(flags, "task1Checklist") && isTask1(taskType)) {
+    lines.push(...buildTask1ChecklistPromptLines(taskType));
+  }
+
+  if (isFeatureEnabled(flags, "structureCoach") && isTask2(taskType)) {
+    lines.push(
+      `Return structureCoach.sections with exactly these names in order: ${STRUCTURE_COACH_SECTIONS.join(", ")}.`,
+      "For each section, set met true or false and a short diagnostic note only.",
+      "Do not change numeric band scores based on structureCoach.",
+      "Do not write sample paragraphs or rewrites."
     );
   }
 

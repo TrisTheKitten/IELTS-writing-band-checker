@@ -79,6 +79,10 @@ html[data-theme="light"] {
   --score-card-text: #f5f3ef;
   --score-card-muted: #a8a29c;
   --input-bg: #faf9f7;
+  --mark-correction-bg: #fde8e8;
+  --mark-correction-line: #b91c1c;
+  --mark-vocabulary-bg: #fef3c7;
+  --mark-vocabulary-line: #b45309;
   --shadow-sm: none;
   --shadow-panel: none;
   --shadow-elevated: none;
@@ -115,6 +119,10 @@ html[data-theme="dark"] {
   --score-card-text: #1a1816;
   --score-card-muted: #5c5750;
   --input-bg: #1a1917;
+  --mark-correction-bg: #3d2428;
+  --mark-correction-line: #fca5a5;
+  --mark-vocabulary-bg: #3d3420;
+  --mark-vocabulary-line: #fcd34d;
   --shadow-sm: none;
   --shadow-panel: none;
   --shadow-elevated: none;

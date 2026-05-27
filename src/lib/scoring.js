@@ -3,7 +3,9 @@ import {
   DEFAULT_FEEDBACK_LANGUAGE,
   FEATURE_FLAG_IDS,
   FEATURE_FLAGS,
+  getEffectiveFeatureFlags,
   isFeatureEnabled,
+  USER_TOGGLEABLE_FEATURE_FLAGS,
   isTask1,
   MAX_ESSAY_LENGTH,
   MAX_SCORE,
@@ -20,6 +22,8 @@ export {
   DEFAULT_FEEDBACK_LANGUAGE,
   FEATURE_FLAG_IDS,
   FEATURE_FLAGS,
+  getEffectiveFeatureFlags,
+  USER_TOGGLEABLE_FEATURE_FLAGS,
   MAX_ESSAY_LENGTH,
   MAX_SCORE,
   MIN_ESSAY_LENGTH,
@@ -40,12 +44,21 @@ export const EMPTY_RESULT = {
   summary: "",
   criteria: [],
   corrections: [],
-  improvedVocabulary: []
+  improvedVocabulary: [],
+  task1Checklist: [],
+  structureCoach: null
 };
+
+export const DEFAULT_FEATURE_FLAGS = [
+  "aiReasoning",
+  "detailedFeedback",
+  "improveWordChoice"
+];
 
 export const DEFAULT_OPTIONS = {
   taskType: TASK_TYPES[0],
-  featureFlags: [...FEATURE_FLAG_IDS]
+  examMode: false,
+  featureFlags: [...DEFAULT_FEATURE_FLAGS]
 };
 
 export async function readJsonPayload(response) {
@@ -60,6 +73,26 @@ export async function readJsonPayload(response) {
   } catch {
     throw new Error("Server returned an invalid response. Try again.");
   }
+}
+
+function normalizeChecklistItem(item) {
+  if (!item || typeof item.met !== "boolean") {
+    return null;
+  }
+
+  const id = item.id || item.name;
+  const label = item.label || item.name;
+
+  if (!id || !label) {
+    return null;
+  }
+
+  return {
+    id,
+    label,
+    met: item.met,
+    note: item.note || ""
+  };
 }
 
 export function normalizeResult(payload, enabledFlags = FEATURE_FLAG_IDS) {
@@ -83,7 +116,50 @@ export function normalizeResult(payload, enabledFlags = FEATURE_FLAG_IDS) {
     improvedVocabulary:
       isFeatureEnabled(flags, "improveWordChoice") && Array.isArray(payload.improvedVocabulary)
         ? payload.improvedVocabulary
-        : []
+        : [],
+    task1Checklist:
+      isFeatureEnabled(flags, "task1Checklist") && Array.isArray(payload.task1Checklist)
+        ? payload.task1Checklist.map(normalizeChecklistItem).filter(Boolean)
+        : [],
+    structureCoach:
+      isFeatureEnabled(flags, "structureCoach") && payload.structureCoach?.sections
+        ? {
+            sections: payload.structureCoach.sections.map(normalizeChecklistItem).filter(Boolean)
+          }
+        : null
+  };
+}
+
+export function getSubmitState({ essay, taskType, questionImage, isChecking }) {
+  if (isChecking) {
+    return {
+      canSubmit: false,
+      blockReason: null,
+      showMinLengthHint: false,
+      showTask1ImageHint: false
+    };
+  }
+
+  const trimmed = String(essay || "").trim();
+  const taskUsesQuestionImage = isTask1(taskType);
+  const hasQuestionImage = Boolean(questionImage?.base64);
+  const meetsMinLength = trimmed.length >= MIN_ESSAY_LENGTH;
+
+  let blockReason = null;
+
+  if (!meetsMinLength) {
+    blockReason = `Write at least ${MIN_ESSAY_LENGTH} characters before checking.`;
+  } else if (taskUsesQuestionImage && !hasQuestionImage) {
+    blockReason = "Upload the Task 1 question image before checking.";
+  }
+
+  const canSubmit = meetsMinLength && (!taskUsesQuestionImage || hasQuestionImage);
+
+  return {
+    canSubmit,
+    blockReason,
+    showMinLengthHint: trimmed.length > 0 && trimmed.length < MIN_ESSAY_LENGTH,
+    showTask1ImageHint: taskUsesQuestionImage && !hasQuestionImage && meetsMinLength
   };
 }
 
@@ -106,20 +182,6 @@ export function countWords(value) {
   return value.trim() ? value.trim().split(WORD_BOUNDARY_PATTERN).length : 0;
 }
 
-export function getSubmitBlockReason({ essay, taskType, questionImage, isChecking }) {
-  if (isChecking) {
-    return null;
-  }
-
-  const trimmed = String(essay || "").trim();
-
-  if (trimmed.length < MIN_ESSAY_LENGTH) {
-    return `Write at least ${MIN_ESSAY_LENGTH} characters before checking.`;
-  }
-
-  if (isTask1(taskType) && !questionImage?.base64) {
-    return "Upload the Task 1 question image before checking.";
-  }
-
-  return null;
+export function getSubmitBlockReason(submitArgs) {
+  return getSubmitState(submitArgs).blockReason;
 }

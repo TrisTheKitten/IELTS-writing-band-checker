@@ -1,32 +1,66 @@
+import { useMemo } from "react";
 import { isTask1, MIN_ESSAY_LENGTH } from "../lib/scoring";
+import { estimateCheckCost, formatCostEstimateLine } from "../lib/estimateCheckCost";
+import { hasGeminiApiKey } from "../lib/geminiApiKey";
 import { Button } from "@/components/ui/button";
 import { OptionPanel } from "./OptionPanel";
 import { PromptImageUpload } from "./PromptImageUpload";
+import { ExamTimerBar } from "./ExamTimerBar";
+import { EssayEditorTabs } from "./EssayEditorTabs";
 
 export function CheckerForm({
   topic,
   questionImage,
   essay,
   wordCount,
+  wordBand,
   options,
+  effectiveFeatureFlags,
   error,
   isChecking,
-  canCheck,
+  submitState,
+  examTimer,
+  highlightSuggestions,
+  onHighlightSuggestionsChange,
+  showHighlightOption,
+  result,
   onTopicChange,
   onQuestionImageChange,
   onEssayChange,
   onOptionChange,
   onToggleFeature,
+  onExamModeChange,
+  onEndExam,
   onClearPrompt,
   onClearEssay,
   onSubmit
 }) {
   const usesQuestionImage = isTask1(options.taskType);
-  const hasEssay = essay.trim().length >= MIN_ESSAY_LENGTH;
+  const { canSubmit, showMinLengthHint, showTask1ImageHint } = submitState;
+
+  const costLine = useMemo(() => {
+    const estimate = estimateCheckCost({
+      essay,
+      topic,
+      hasQuestionImage: usesQuestionImage && Boolean(questionImage?.base64),
+      featureFlags: effectiveFeatureFlags
+    });
+
+    if (hasGeminiApiKey()) {
+      return formatCostEstimateLine(estimate);
+    }
+
+    return "Uses server API key";
+  }, [essay, topic, usesQuestionImage, questionImage, effectiveFeatureFlags]);
 
   return (
     <form className="checker-form" onSubmit={(event) => event.preventDefault()}>
-      <OptionPanel options={options} onOptionChange={onOptionChange} onToggleFeature={onToggleFeature} />
+      <OptionPanel
+        options={options}
+        onOptionChange={onOptionChange}
+        onToggleFeature={onToggleFeature}
+        onExamModeChange={onExamModeChange}
+      />
 
       {usesQuestionImage ? (
         <PromptImageUpload
@@ -60,26 +94,49 @@ export function CheckerForm({
           <label className="input-box__label" htmlFor="essay-input">
             Your answer
           </label>
-          <button className="text-btn" type="button" onClick={onClearEssay}>
-            Clear
-          </button>
+          <div className="input-box__head-actions">
+            {options.examMode && examTimer?.isRunning ? (
+              <ExamTimerBar
+                displayTime={examTimer.displayTime}
+                isTimeUp={examTimer.isTimeUp}
+                onEndExam={onEndExam}
+              />
+            ) : null}
+            <button className="text-btn" type="button" onClick={onClearEssay}>
+              Clear
+            </button>
+          </div>
         </div>
-        <textarea
-          id="essay-input"
-          className="input-box__field input-box__field--essay"
-          value={essay}
-          onChange={(event) => onEssayChange(event.target.value)}
-          placeholder="Write your essay here..."
-        />
+
+        <EssayEditorTabs
+          highlightSuggestions={highlightSuggestions}
+          onHighlightSuggestionsChange={onHighlightSuggestionsChange}
+          showHighlightOption={showHighlightOption}
+          essay={essay}
+          corrections={result.corrections}
+          improvedVocabulary={result.improvedVocabulary}
+        >
+          <textarea
+            id="essay-input"
+            className="input-box__field input-box__field--essay"
+            value={essay}
+            onChange={(event) => onEssayChange(event.target.value)}
+            placeholder="Write your essay here..."
+          />
+        </EssayEditorTabs>
+
         <div className="input-box__footer input-box__footer--stats">
-          <span>{wordCount} words</span>
-          {!canCheck && essay.trim().length > 0 && essay.trim().length < MIN_ESSAY_LENGTH ? (
+          <span className={`word-band word-band--${wordBand.level}`} title={wordBand.label}>
+            {wordCount} {wordCount === 1 ? "word" : "words"}
+            <span className="word-band__hint">{wordBand.label}</span>
+          </span>
+          {showMinLengthHint ? (
             <span className="form-hint">Min {MIN_ESSAY_LENGTH} characters</span>
           ) : null}
         </div>
       </div>
 
-      {usesQuestionImage && !questionImage && hasEssay ? (
+      {showTask1ImageHint ? (
         <p className="form-hint">Upload the Task 1 question image to check your score.</p>
       ) : null}
 
@@ -90,19 +147,17 @@ export function CheckerForm({
       ) : null}
 
       <div className="checker-form__actions">
-        <Button
-          type="button"
-          className="checker-form__submit"
-          disabled={isChecking || !canCheck}
-          onClick={onSubmit}
-        >
-          {isChecking ? "Scoring…" : "Get band score"}
-        </Button>
-        {wordCount > 0 && (
-          <span className="checker-form__word-count">
-            {wordCount} {wordCount === 1 ? "word" : "words"}
-          </span>
-        )}
+        <div className="checker-form__submit-group">
+          <Button
+            type="button"
+            className="checker-form__submit"
+            disabled={isChecking || !canSubmit}
+            onClick={onSubmit}
+          >
+            {isChecking ? "Scoring…" : "Get band score"}
+          </Button>
+          <p className="checker-form__cost-estimate">{costLine}</p>
+        </div>
       </div>
     </form>
   );

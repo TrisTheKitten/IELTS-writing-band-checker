@@ -1,9 +1,7 @@
-import { useId } from "react";
+import { Tooltip } from "./Tooltip";
 
 export function OptionCheckbox({ id, label, checked, onChange, variant = "card", tooltip }) {
-  const tooltipId = useId();
-
-  return (
+  const checkbox = (
     <label
       className={`option-checkbox option-checkbox--${variant}${checked ? " is-checked" : ""}${tooltip ? " option-checkbox--has-tooltip" : ""}`}
       htmlFor={id}
@@ -14,7 +12,6 @@ export function OptionCheckbox({ id, label, checked, onChange, variant = "card",
         className="option-checkbox__input"
         checked={checked}
         onChange={onChange}
-        aria-describedby={tooltip ? tooltipId : undefined}
       />
       <span className="option-checkbox__box" aria-hidden="true">
         <svg
@@ -33,11 +30,16 @@ export function OptionCheckbox({ id, label, checked, onChange, variant = "card",
         </svg>
       </span>
       <span className="option-checkbox__label">{label}</span>
-      {tooltip ? (
-        <span id={tooltipId} role="tooltip" className="ui-tooltip">
-          {tooltip}
-        </span>
-      ) : null}
     </label>
+  );
+
+  if (!tooltip) {
+    return checkbox;
+  }
+
+  return (
+    <Tooltip content={tooltip} portaled placement="top" align="start">
+      {checkbox}
+    </Tooltip>
   );
 }

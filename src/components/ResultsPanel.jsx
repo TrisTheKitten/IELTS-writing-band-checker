@@ -1,11 +1,20 @@
-import { isFeatureEnabled } from "@shared/ielts-contract.js";
+import { isFeatureEnabled, isTask1 } from "@shared/ielts-contract.js";
 import { AnalysisEmptyPreview } from "./AnalysisEmptyPreview";
 import { AnalysisLoading } from "./AnalysisLoading";
 import { OverallScoreCard } from "./OverallScoreCard";
 import { ScoreGrid } from "./ScoreGrid";
+import { buildTask1ChecklistDisplayItems } from "../lib/checklistDisplay";
 import { formatScore } from "../lib/scoring";
 
-export function ResultsPanel({ result, enabledFeatureFlags, hasResult, isChecking, animate }) {
+export function ResultsPanel({
+  result,
+  enabledFeatureFlags,
+  taskType,
+  wordBand,
+  hasResult,
+  isChecking,
+  animate
+}) {
   if (isChecking) {
     return <AnalysisLoading />;
   }
@@ -29,6 +38,14 @@ export function ResultsPanel({ result, enabledFeatureFlags, hasResult, isCheckin
   const showSummary = isFeatureEnabled(enabledFeatureFlags, "aiReasoning");
   const showCriteria = isFeatureEnabled(enabledFeatureFlags, "detailedFeedback");
   const showWordChoice = isFeatureEnabled(enabledFeatureFlags, "improveWordChoice");
+  const showTask1Checklist =
+    isFeatureEnabled(enabledFeatureFlags, "task1Checklist") && isTask1(taskType);
+  const showStructureCoach =
+    isFeatureEnabled(enabledFeatureFlags, "structureCoach") && !isTask1(taskType);
+
+  const task1Items = showTask1Checklist
+    ? buildTask1ChecklistDisplayItems(result.task1Checklist, wordBand)
+    : [];
 
   return (
     <aside
@@ -45,6 +62,14 @@ export function ResultsPanel({ result, enabledFeatureFlags, hasResult, isCheckin
         <ScoreGrid result={result} animate={animate} />
 
         {showSummary && result.summary ? <p className="analysis-summary">{result.summary}</p> : null}
+
+        {showStructureCoach && result.structureCoach?.sections?.length > 0 ? (
+          <DiagnosticChecklistCard title="Essay structure" items={result.structureCoach.sections} />
+        ) : null}
+
+        {showTask1Checklist && task1Items.length > 0 ? (
+          <DiagnosticChecklistCard title="Task 1 checklist" items={task1Items} />
+        ) : null}
 
         {showCriteria && result.criteria.length > 0 ? (
           <div className="analysis-cards">
@@ -70,6 +95,32 @@ export function ResultsPanel({ result, enabledFeatureFlags, hasResult, isCheckin
         <FeedbackSections result={result} showWordChoice={showWordChoice} />
       </div>
     </aside>
+  );
+}
+
+function DiagnosticChecklistCard({ title, items }) {
+  return (
+    <article className="analysis-card diagnostic-checklist">
+      <header className="analysis-card__head">
+        <h3>{title}</h3>
+      </header>
+      <ul className="diagnostic-checklist__list">
+        {items.map((item) => (
+          <li
+            key={item.id}
+            className={`diagnostic-checklist__item${item.met ? " is-met" : " is-unmet"}`}
+          >
+            <span className="diagnostic-checklist__status" aria-hidden="true">
+              {item.met ? "✓" : "✗"}
+            </span>
+            <div className="diagnostic-checklist__body">
+              <p className="diagnostic-checklist__label">{item.label}</p>
+              {item.note ? <p className="diagnostic-checklist__note">{item.note}</p> : null}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </article>
   );
 }
 

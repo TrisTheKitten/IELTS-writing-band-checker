@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildTask1ChecklistPromptLines,
+  getEffectiveFeatureFlags,
+  isTask1Academic,
+  isTask2,
   MAX_QUESTION_IMAGE_BYTES,
   normalizeQuestionImage,
   parseFeatureFlags,
@@ -23,6 +27,48 @@ describe("parseFeatureFlags", () => {
       "detailedFeedback"
     ]);
     expect(parseFeatureFlags(null)).toEqual([]);
+  });
+});
+
+describe("task type helpers", () => {
+  it("detects task 2 and academic task 1", () => {
+    expect(isTask2("IELTS Writing Task 2")).toBe(true);
+    expect(isTask2("IELTS Writing Task 1 (Academic)")).toBe(false);
+    expect(isTask1Academic("IELTS Writing Task 1 (Academic)")).toBe(true);
+    expect(isTask1Academic("IELTS Writing Task 1 (General)")).toBe(false);
+  });
+});
+
+describe("buildTask1ChecklistPromptLines", () => {
+  it("returns academic checklist lines for task 1 academic", () => {
+    const lines = buildTask1ChecklistPromptLines("IELTS Writing Task 1 (Academic)");
+    expect(lines[0]).toMatch(/task1Checklist/);
+    expect(lines.some((line) => line.includes("overview"))).toBe(true);
+    expect(lines.some((line) => line.includes("noOpinion"))).toBe(true);
+  });
+
+  it("returns nothing for task 2", () => {
+    expect(buildTask1ChecklistPromptLines("IELTS Writing Task 2")).toEqual([]);
+  });
+});
+
+describe("getEffectiveFeatureFlags", () => {
+  const userFlags = ["aiReasoning", "detailedFeedback", "improveWordChoice"];
+
+  it("adds structure coach for Task 2", () => {
+    expect(getEffectiveFeatureFlags("IELTS Writing Task 2", userFlags)).toEqual([
+      ...userFlags,
+      "structureCoach"
+    ]);
+  });
+
+  it("adds task 1 checklist for Task 1 and drops structure coach", () => {
+    expect(
+      getEffectiveFeatureFlags("IELTS Writing Task 1 (Academic)", [
+        ...userFlags,
+        "structureCoach"
+      ])
+    ).toEqual([...userFlags, "task1Checklist"]);
   });
 });
 

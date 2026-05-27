@@ -4,6 +4,11 @@
   max-width: 100%;
 }
 
+.tooltip-trigger-wrap {
+  display: inline-flex;
+  max-width: 100%;
+}
+
 .ui-tooltip {
   position: absolute;
   z-index: 30;
@@ -79,6 +84,40 @@
 .tooltip-host--align-start:hover .ui-tooltip--bottom,
 .tooltip-host--align-start:focus-within .ui-tooltip--bottom {
   transform: translateY(0);
+}
+
+.ui-tooltip--portaled {
+  position: fixed;
+  z-index: 1000;
+  bottom: auto;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.ui-tooltip--portaled-top {
+  transform: translate(-50%, calc(-100% - var(--space-1)));
+}
+
+.ui-tooltip--portaled-bottom {
+  transform: translateX(-50%);
+}
+
+.tooltip-host--align-end.ui-tooltip--portaled {
+  transform: translateX(-100%);
+}
+
+.tooltip-host--align-end.ui-tooltip--portaled-top {
+  transform: translate(-100%, calc(-100% - var(--space-1)));
+}
+
+.tooltip-host--align-start.ui-tooltip--portaled {
+  transform: translateX(0);
+}
+
+.tooltip-host--align-start.ui-tooltip--portaled-top {
+  transform: translate(0, calc(-100% - var(--space-1)));
 }
 
 @media (prefers-reduced-motion: reduce) {

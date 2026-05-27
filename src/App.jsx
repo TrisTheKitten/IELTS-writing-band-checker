@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { isFeatureEnabled, isTask1 } from "@shared/ielts-contract.js";
 import { BrandMarkIcon } from "./components/icons/BrandMarkIcon";
 import { CheckerForm } from "./components/CheckerForm";
 import { ResultsPanel } from "./components/ResultsPanel";
@@ -6,17 +7,18 @@ import { ApiKeySettings } from "./components/ApiKeySettings";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
 import { useTheme } from "./hooks/useTheme";
+import { useExamSession } from "./hooks/useExamSession";
+import { getWordBandStatus } from "./lib/wordBands";
 import {
   API_ENDPOINT,
   DEFAULT_FEEDBACK_LANGUAGE,
   DEFAULT_OPTIONS,
   EMPTY_RESULT,
-  isTask1,
-  MIN_ESSAY_LENGTH,
+  getEffectiveFeatureFlags,
   normalizeResult,
   readJsonPayload,
   countWords,
-  getSubmitBlockReason
+  getSubmitState
 } from "./lib/scoring";
 
 export function App() {
@@ -30,16 +32,54 @@ export function App() {
   const [isChecking, setIsChecking] = useState(false);
   const [hasResult, setHasResult] = useState(false);
   const [animateResults, setAnimateResults] = useState(false);
+  const [highlightSuggestions, setHighlightSuggestions] = useState(false);
+
+  const handleTimeUp = useCallback(() => {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification("IELTS exam time", {
+        body: "Time's up — you can still check your score."
+      });
+    }
+  }, []);
+
+  const examSession = useExamSession({
+    taskType: options.taskType,
+    onTimeUp: handleTimeUp
+  });
 
   const wordCount = useMemo(() => countWords(essay), [essay]);
+  const wordBand = useMemo(
+    () => getWordBandStatus(options.taskType, wordCount),
+    [options.taskType, wordCount]
+  );
   const taskUsesQuestionImage = isTask1(options.taskType);
-  const hasEssay = essay.trim().length >= MIN_ESSAY_LENGTH;
-  const hasQuestionImage = Boolean(questionImage?.base64);
-  const canCheck =
-    hasEssay && !isChecking && (!taskUsesQuestionImage || hasQuestionImage);
+
+  const submitState = useMemo(
+    () =>
+      getSubmitState({
+        essay,
+        taskType: options.taskType,
+        questionImage,
+        isChecking
+      }),
+    [essay, options.taskType, questionImage, isChecking]
+  );
+
+  const effectiveFeatureFlags = useMemo(
+    () => getEffectiveFeatureFlags(options.taskType, options.featureFlags),
+    [options.taskType, options.featureFlags]
+  );
+
+  const showHighlightOption = useMemo(
+    () =>
+      hasResult &&
+      isFeatureEnabled(effectiveFeatureFlags, "improveWordChoice") &&
+      (result.corrections.length > 0 || result.improvedVocabulary.length > 0),
+    [hasResult, effectiveFeatureFlags, result.corrections, result.improvedVocabulary]
+  );
 
   async function handleCheckScore() {
-    const blockReason = getSubmitBlockReason({
+    const { canSubmit, blockReason } = getSubmitState({
       essay,
       taskType: options.taskType,
       questionImage,
@@ -51,7 +91,7 @@ export function App() {
       return;
     }
 
-    if (!canCheck) {
+    if (!canSubmit) {
       return;
     }
 
@@ -72,7 +112,7 @@ export function App() {
           essay,
           taskType: options.taskType,
           aiLanguage: DEFAULT_FEEDBACK_LANGUAGE,
-          featureFlags: options.featureFlags
+          featureFlags: effectiveFeatureFlags
         })
       });
 
@@ -82,8 +122,9 @@ export function App() {
         throw new Error(payload.error || "Score check failed. Try again.");
       }
 
-      setResult(normalizeResult(payload, options.featureFlags));
+      setResult(normalizeResult(payload, effectiveFeatureFlags));
       setHasResult(true);
+      setHighlightSuggestions(false);
       requestAnimationFrame(() => setAnimateResults(true));
     } catch (requestError) {
       setError(requestError.message);
@@ -97,6 +138,12 @@ export function App() {
       const nextUsesImage = isTask1(value);
       const currentUsesImage = isTask1(options.taskType);
 
+      if (
+        !examSession.confirmTaskTypeChange(value, options.taskType, options.examMode)
+      ) {
+        return;
+      }
+
       if (nextUsesImage !== currentUsesImage) {
         if (nextUsesImage) {
           setTopic("");
@@ -107,6 +154,16 @@ export function App() {
     }
 
     setOptions((current) => ({ ...current, [key]: value }));
+  }
+
+  function handleExamModeChange(enabled) {
+    setOptions((current) => ({ ...current, examMode: enabled }));
+    examSession.setExamMode(enabled);
+  }
+
+  function handleEndExam() {
+    setOptions((current) => ({ ...current, examMode: false }));
+    examSession.endExam();
   }
 
   function toggleFeatureFlag(featureFlagId) {
@@ -149,26 +206,37 @@ export function App() {
               questionImage={questionImage}
               essay={essay}
               wordCount={wordCount}
+              wordBand={wordBand}
               options={options}
               error={error}
               isChecking={isChecking}
-              canCheck={canCheck}
+              submitState={submitState}
+              examTimer={examSession.examTimer}
+              highlightSuggestions={highlightSuggestions}
+              onHighlightSuggestionsChange={setHighlightSuggestions}
+              showHighlightOption={showHighlightOption}
+              result={result}
               onTopicChange={setTopic}
               onQuestionImageChange={setQuestionImage}
               onEssayChange={setEssay}
               onOptionChange={handleOptionChange}
               onToggleFeature={toggleFeatureFlag}
+              onExamModeChange={handleExamModeChange}
+              onEndExam={handleEndExam}
               onClearPrompt={() => {
                 setTopic("");
                 setQuestionImage(null);
               }}
               onClearEssay={() => setEssay("")}
               onSubmit={handleCheckScore}
+              effectiveFeatureFlags={effectiveFeatureFlags}
             />
           </section>
           <ResultsPanel
             result={result}
-            enabledFeatureFlags={options.featureFlags}
+            enabledFeatureFlags={effectiveFeatureFlags}
+            taskType={options.taskType}
+            wordBand={wordBand}
             hasResult={hasResult}
             isChecking={isChecking}
             animate={animateResults}

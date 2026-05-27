@@ -1,7 +1,7 @@
-import { FEATURE_FLAGS, TASK_TYPE_OPTIONS } from "../lib/scoring";
+import { TASK_TYPE_OPTIONS, USER_TOGGLEABLE_FEATURE_FLAGS } from "../lib/scoring";
 import { OptionCheckbox } from "./OptionCheckbox";
 
-export function OptionPanel({ options, onOptionChange, onToggleFeature }) {
+export function OptionPanel({ options, onOptionChange, onToggleFeature, onExamModeChange }) {
   return (
     <div className="option-panel">
       <div className="option-panel__block">
@@ -34,13 +34,27 @@ export function OptionPanel({ options, onOptionChange, onToggleFeature }) {
       </div>
 
       <div className="option-panel__block">
+        <p className="option-panel__title" id="practice-label">
+          Practice
+        </p>
+        <OptionCheckbox
+          id="exam-mode"
+          label="Exam mode"
+          tooltip="Task 2: 40 min · Task 1: 20 min. Timer is advisory; scoring stays available."
+          checked={options.examMode}
+          variant="pill"
+          onChange={() => onExamModeChange(!options.examMode)}
+        />
+      </div>
+
+      <div className="option-panel__block">
         <p className="option-panel__title" id="feedback-options-label">
           Feedback
         </p>
         <fieldset className="feature-toggles" aria-labelledby="feedback-options-label">
           <legend className="visually-hidden">Feedback options</legend>
           <div className="feature-toggles__list">
-            {FEATURE_FLAGS.map((featureFlag) => {
+            {USER_TOGGLEABLE_FEATURE_FLAGS.map((featureFlag) => {
               const id = `feature-${featureFlag.id}`;
               const checked = options.featureFlags.includes(featureFlag.id);
 
