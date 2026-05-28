@@ -1,7 +1,10 @@
 import { useRef, useState } from "react";
-import { Settings } from "lucide-react";
+import { Play, Settings } from "lucide-react";
 import { clearGeminiApiKey, getGeminiApiKey, setGeminiApiKey } from "../lib/geminiApiKey";
 import { Tooltip } from "./Tooltip";
+
+const GEMINI_API_KEY_TUTORIAL_URL =
+  "https://youtu.be/RVGbLSVFtIk?si=D61z1tZ7Ffn9FNwq";
 
 export function ApiKeySettings() {
   const dialogRef = useRef(null);
@@ -81,8 +84,27 @@ export function ApiKeySettings() {
             </button>
           </header>
 
+          <section className="settings-dialog__guide" aria-labelledby="settings-guide-title">
+            <h3 id="settings-guide-title" className="settings-dialog__guide-title">
+              First time here?
+            </h3>
+            <p className="settings-dialog__guide-lead">
+              You need a free key from Google AI Studio. Watch the short video, copy your key,
+              then paste it in the box below.
+            </p>
+            <a
+              href={GEMINI_API_KEY_TUTORIAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="settings-dialog__tutorial"
+            >
+              <Play size={16} strokeWidth={2} aria-hidden="true" />
+              Watch tutorial
+            </a>
+          </section>
+
           <label className="settings-dialog__field">
-            <span className="settings-dialog__label">API key</span>
+            <span className="settings-dialog__label">Paste your key</span>
             <input
               type="password"
               name="geminiApiKey"

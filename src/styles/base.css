@@ -217,6 +217,56 @@ button:disabled {
   background: var(--accent-subtle);
 }
 
+.settings-dialog__guide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--accent-subtle);
+}
+
+.settings-dialog__guide-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.settings-dialog__guide-lead {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.settings-dialog__tutorial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.settings-dialog__tutorial:hover {
+  border-color: var(--border-strong);
+}
+
+.settings-dialog__tutorial:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .settings-dialog__field {
   display: flex;
   flex-direction: column;
