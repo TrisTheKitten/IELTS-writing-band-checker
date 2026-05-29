@@ -4,10 +4,12 @@ import { BrandMarkIcon } from "./components/icons/BrandMarkIcon";
 import { CheckerForm } from "./components/CheckerForm";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { ApiKeySettings } from "./components/ApiKeySettings";
+import { FontFamilyMenu } from "./components/FontFamilyMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
 import { useTheme } from "./hooks/useTheme";
+import { useUiFont } from "./hooks/useUiFont";
 import { useExamSession } from "./hooks/useExamSession";
 import { getWordBandStatus } from "./lib/wordBands";
 import {
@@ -23,6 +25,7 @@ import {
 } from "./lib/scoring";
 export function App() {
   const { theme, toggleTheme } = useTheme();
+  const { uiFontId, selectUiFont } = useUiFont();
   const [topic, setTopic] = useState("");
   const [questionImage, setQuestionImage] = useState(null);
   const [essay, setEssay] = useState("");
@@ -244,6 +247,7 @@ export function App() {
             </div>
           </div>
           <div className="site-bar__right">
+            <FontFamilyMenu uiFontId={uiFontId} onSelectUiFont={selectUiFont} />
             <ApiKeySettings />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>

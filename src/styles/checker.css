@@ -142,6 +142,7 @@ html[data-theme="dark"] .exam-timer--time-up .exam-timer__clock {
   border: 1px solid var(--border);
   background: var(--input-bg);
   color: var(--text);
+  font-family: var(--font-sans);
   font-size: 0.9375rem;
   line-height: 1.65;
   white-space: pre-wrap;
@@ -465,6 +466,7 @@ html[data-theme="dark"] .exam-timer--time-up .exam-timer__clock {
   resize: vertical;
   line-height: 1.65;
   font-size: 0.9375rem;
+  font-family: var(--font-sans);
 }
 
 .input-box__field::placeholder {

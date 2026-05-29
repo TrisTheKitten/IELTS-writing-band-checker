@@ -6,12 +6,14 @@ export function AnalysisEmptyPreview() {
   return (
     <div className="analysis-empty-preview" aria-hidden="true">
       <div className="score-card score-card--placeholder">
-        <div className="score-card__header">
-          <span className="score-card__label">Estimated overall</span>
-          <span className="score-card__scale-cap">/ {MAX_SCORE}</span>
-        </div>
+        <span className="score-card__label">Estimated overall</span>
         <div className="score-card__hero">
-          <strong className="analysis-empty-preview__score">—</strong>
+          <div className="score-card__score-line">
+            <strong className="analysis-empty-preview__score">—</strong>
+            <span className="score-card__denom" aria-hidden="true">
+              / {MAX_SCORE}
+            </span>
+          </div>
         </div>
       </div>
 

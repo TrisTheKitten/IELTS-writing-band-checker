@@ -119,7 +119,7 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
 }
 
 .score-card--placeholder .score-card__label,
-.score-card--placeholder .score-card__scale-cap {
+.score-card--placeholder .score-card__denom {
   color: var(--text-muted);
 }
 
@@ -302,17 +302,12 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
   background: var(--score-card-bg);
   color: var(--score-card-text);
   border: 1px solid color-mix(in srgb, var(--score-card-text) 12%, transparent);
+  min-width: 0;
+  container-type: inline-size;
 }
 
 .analysis-sidebar--animate .score-card {
   animation: rise-in var(--duration-mid) var(--ease-out) both;
-}
-
-.score-card__header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
 }
 
 .score-card__label {
@@ -323,13 +318,6 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
   color: var(--score-card-muted);
 }
 
-.score-card__scale-cap {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: var(--score-card-muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .score-card__hero {
   display: flex;
   align-items: flex-end;
@@ -337,13 +325,31 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
   gap: var(--space-5);
 }
 
+.score-card__score-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2em;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .score-card__value {
   font-family: var(--font-serif);
-  font-size: clamp(3rem, 8vw, 3.75rem);
+  font-size: clamp(2.25rem, 18cqi, 3.75rem);
   font-weight: 600;
   line-height: 0.9;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
+}
+
+.score-card__denom {
+  flex-shrink: 0;
+  font-size: clamp(0.9375rem, 5.5cqi, 1.375rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--score-card-muted);
+  letter-spacing: -0.01em;
+  translate: 0 -0.12em;
 }
 
 .score-card__range-block {
@@ -369,46 +375,98 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
 }
 
 .score-card__scale {
+  padding-top: var(--space-1);
+  min-width: 0;
+}
+
+.score-card__scale-rail {
   display: grid;
   gap: var(--space-2);
+  min-width: 0;
+  padding-inline: 6px;
 }
 
 .score-card__scale-track {
   position: relative;
-  height: 6px;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--score-card-text) 14%, transparent);
+  height: 8px;
+  min-width: 0;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--score-card-text) 12%, transparent);
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--score-card-bg) 40%, transparent);
   overflow: visible;
 }
 
+.score-card__scale-tick {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 1px;
+  height: 10px;
+  margin-left: -0.5px;
+  transform: translateY(-50%);
+  background: color-mix(in srgb, var(--score-card-text) 22%, transparent);
+  pointer-events: none;
+}
+
+.score-card__scale-tick:first-child,
+.score-card__scale-tick:last-child {
+  height: 12px;
+  background: color-mix(in srgb, var(--score-card-text) 34%, transparent);
+}
+
+.score-card__scale-labels {
+  position: relative;
+  height: 0.75rem;
+}
+
+.score-card__scale-label {
+  position: absolute;
+  top: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--score-card-muted);
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+.score-card__scale-label--min {
+  transform: translateX(0);
+}
+
+.score-card__scale-label--max {
+  transform: translateX(-100%);
+}
+
 .score-card__scale-fill {
+  position: relative;
+  z-index: 0;
   height: 100%;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--score-card-text) 42%, transparent);
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--score-card-text) 28%, transparent),
+    color-mix(in srgb, var(--score-card-text) 52%, transparent)
+  );
   transition: width var(--duration-slow) var(--ease-out);
 }
 
 .score-card__scale-marker {
   position: absolute;
   top: 50%;
-  width: 10px;
-  height: 10px;
-  margin-left: -5px;
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
   border-radius: 50%;
   background: var(--score-card-text);
   border: 2px solid var(--score-card-bg);
   transform: translateY(-50%);
   transition: left var(--duration-slow) var(--ease-out);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--score-card-text) 20%, transparent);
-}
-
-.score-card__scale-ends {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.625rem;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  color: var(--score-card-muted);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--score-card-text) 24%, transparent),
+    0 1px 3px color-mix(in srgb, var(--score-card-bg) 55%, transparent);
 }
 
 .score-grid {
@@ -638,9 +696,13 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
   .analysis-sidebar {
     min-height: 0;
   }
-}
+
   .analysis-sidebar__head,
   .analysis-sidebar__body {
+    padding-inline: var(--space-4);
+  }
+
+  .score-card {
     padding-inline: var(--space-4);
   }
 
@@ -658,3 +720,18 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
   .score-grid__value {
     font-size: 1.375rem;
   }
+}
+
+@media (min-width: 1024px) {
+  .score-card__hero {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .score-card__range-block {
+    flex-shrink: 0;
+    text-align: right;
+    padding-bottom: 0.35em;
+  }
+}

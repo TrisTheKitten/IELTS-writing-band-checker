@@ -6,6 +6,7 @@
 
 @import "./tokens.css";
 @import "./base.css";
+@import "./dropdown.css";
 @import "./checker.css";
 @import "./tooltip.css";
 @import "./analysis.css";

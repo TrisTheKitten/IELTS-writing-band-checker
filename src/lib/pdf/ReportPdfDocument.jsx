@@ -17,12 +17,22 @@ import {
   SITE_URL
 } from "../siteLinks.js";
 
-function createStyles(theme) {
+function createBoldFontStyle(pdfFonts) {
+  if (pdfFonts.boldUsesWeight) {
+    return { fontFamily: pdfFonts.body, fontWeight: 700 };
+  }
+
+  return { fontFamily: pdfFonts.bold };
+}
+
+function createStyles(theme, pdfFonts) {
+  const boldFont = createBoldFontStyle(pdfFonts);
+
   return StyleSheet.create({
     page: {
       backgroundColor: theme.pageBackground,
       color: theme.text,
-      fontFamily: "Helvetica",
+      fontFamily: pdfFonts.body,
       fontSize: 10,
       lineHeight: 1.45,
       paddingTop: 40,
@@ -42,7 +52,7 @@ function createStyles(theme) {
     footerTitle: {
       color: theme.text,
       fontSize: 8,
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       marginBottom: 3
     },
     footerLine: {
@@ -70,7 +80,7 @@ function createStyles(theme) {
     },
     label: {
       fontSize: 8,
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       textTransform: "uppercase",
       letterSpacing: 0.6,
       color: theme.textMuted,
@@ -78,7 +88,7 @@ function createStyles(theme) {
     },
     title: {
       fontSize: 16,
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       marginBottom: 4
     },
     meta: {
@@ -119,7 +129,7 @@ function createStyles(theme) {
     },
     overallValue: {
       fontSize: 22,
-      fontFamily: "Helvetica-Bold"
+      ...boldFont
     },
     criteriaGrid: {
       flexDirection: "row",
@@ -135,7 +145,7 @@ function createStyles(theme) {
     },
     criteriaBadge: {
       fontSize: 7,
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       color: theme.scoreCardMuted,
       marginBottom: 2
     },
@@ -146,7 +156,7 @@ function createStyles(theme) {
     },
     criteriaScore: {
       fontSize: 14,
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       color: theme.text
     },
     card: {
@@ -163,11 +173,11 @@ function createStyles(theme) {
       marginBottom: 6
     },
     cardTitle: {
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       fontSize: 10
     },
     cardScore: {
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       fontSize: 10
     },
     bullet: {
@@ -182,7 +192,7 @@ function createStyles(theme) {
     },
     diagnosticStatus: {
       width: 12,
-      fontFamily: "Helvetica-Bold",
+      ...boldFont,
       fontSize: 10
     },
     diagnosticMet: {
@@ -384,8 +394,8 @@ function ReportPage({ sections, styles, pageKey }) {
   );
 }
 
-export function ReportPdfDocument({ sections, theme }) {
-  const styles = createStyles(theme);
+export function ReportPdfDocument({ sections, theme, pdfFonts }) {
+  const styles = createStyles(theme, pdfFonts);
   const { essaySections, analysisSections } = splitSectionsByPage(sections);
 
   return (

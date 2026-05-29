@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Play, Settings } from "lucide-react";
+import { KeyRound, Play } from "lucide-react";
 import { clearGeminiApiKey, getGeminiApiKey, setGeminiApiKey } from "../lib/geminiApiKey";
 import { Tooltip } from "./Tooltip";
 
@@ -50,13 +50,13 @@ export function ApiKeySettings() {
       >
         <button
           type="button"
-          className="settings-trigger"
+          className="site-bar__control settings-trigger"
           onClick={openDialog}
           aria-haspopup="dialog"
           aria-expanded={false}
         >
-          <Settings size={16} strokeWidth={1.75} aria-hidden="true" />
-          <span>Settings</span>
+          <KeyRound size={16} strokeWidth={1.75} aria-hidden="true" />
+          <span>API key</span>
           {hasKey ? <span className="settings-trigger__dot" aria-hidden="true" /> : null}
         </button>
       </Tooltip>
@@ -72,13 +72,13 @@ export function ApiKeySettings() {
         >
           <header className="settings-dialog__head">
             <h2 id="settings-title" className="settings-dialog__title">
-              Settings
+              API key
             </h2>
             <button
               type="button"
               className="settings-dialog__close"
               onClick={closeDialog}
-              aria-label="Close settings"
+              aria-label="Close API key"
             >
               Close
             </button>
