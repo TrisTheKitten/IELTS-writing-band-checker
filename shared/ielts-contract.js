@@ -13,6 +13,16 @@ export const TASK_TYPES = [
   "IELTS Writing Task 1 (General)"
 ];
 
+export const TASK_TYPE_SLUGS = {
+  [TASK_TYPES[0]]: "task2",
+  [TASK_TYPES[1]]: "task1-academic",
+  [TASK_TYPES[2]]: "task1-general"
+};
+
+export function taskTypeToSlug(taskType) {
+  return TASK_TYPE_SLUGS[taskType] || "writing";
+}
+
 export const TASK_TYPE_OPTIONS = [
   { value: TASK_TYPES[0], label: "Task 2", hint: "Essay" },
   { value: TASK_TYPES[1], label: "Task 1", hint: "Academic" },

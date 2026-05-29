@@ -591,6 +591,13 @@ html[data-theme="dark"] .exam-timer--time-up .exam-timer__clock {
   font-variant-numeric: tabular-nums;
 }
 
+.input-box__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
 .text-btn {
   border: 0;
   padding: 0;

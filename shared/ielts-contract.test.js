@@ -7,7 +7,9 @@ import {
   MAX_QUESTION_IMAGE_BYTES,
   normalizeQuestionImage,
   parseFeatureFlags,
-  snapToHalfBand
+  snapToHalfBand,
+  TASK_TYPES,
+  taskTypeToSlug
 } from "./ielts-contract.js";
 
 describe("snapToHalfBand", () => {
@@ -36,6 +38,15 @@ describe("task type helpers", () => {
     expect(isTask2("IELTS Writing Task 1 (Academic)")).toBe(false);
     expect(isTask1Academic("IELTS Writing Task 1 (Academic)")).toBe(true);
     expect(isTask1Academic("IELTS Writing Task 1 (General)")).toBe(false);
+  });
+});
+
+describe("taskTypeToSlug", () => {
+  it("maps known task types to stable slugs", () => {
+    expect(taskTypeToSlug(TASK_TYPES[0])).toBe("task2");
+    expect(taskTypeToSlug(TASK_TYPES[1])).toBe("task1-academic");
+    expect(taskTypeToSlug(TASK_TYPES[2])).toBe("task1-general");
+    expect(taskTypeToSlug("unknown")).toBe("writing");
   });
 });
 

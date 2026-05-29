@@ -1,19 +1,20 @@
-import { isFeatureEnabled, isTask1 } from "@shared/ielts-contract.js";
 import { AnalysisEmptyPreview } from "./AnalysisEmptyPreview";
 import { AnalysisLoading } from "./AnalysisLoading";
 import { OverallScoreCard } from "./OverallScoreCard";
 import { ScoreGrid } from "./ScoreGrid";
-import { buildTask1ChecklistDisplayItems } from "../lib/checklistDisplay";
+import { Button } from "@/components/ui/button";
+import { buildAnalysisBlocks } from "../lib/buildAnalysisBlocks";
 import { formatScore } from "../lib/scoring";
 
 export function ResultsPanel({
   result,
-  enabledFeatureFlags,
-  taskType,
   wordBand,
   hasResult,
   isChecking,
-  animate
+  animate,
+  onDownloadReportPdf,
+  reportPdfError,
+  isPdfDownloading
 }) {
   if (isChecking) {
     return <AnalysisLoading />;
@@ -35,17 +36,7 @@ export function ResultsPanel({
     );
   }
 
-  const showSummary = isFeatureEnabled(enabledFeatureFlags, "aiReasoning");
-  const showCriteria = isFeatureEnabled(enabledFeatureFlags, "detailedFeedback");
-  const showWordChoice = isFeatureEnabled(enabledFeatureFlags, "improveWordChoice");
-  const showTask1Checklist =
-    isFeatureEnabled(enabledFeatureFlags, "task1Checklist") && isTask1(taskType);
-  const showStructureCoach =
-    isFeatureEnabled(enabledFeatureFlags, "structureCoach") && !isTask1(taskType);
-
-  const task1Items = showTask1Checklist
-    ? buildTask1ChecklistDisplayItems(result.task1Checklist, wordBand)
-    : [];
+  const analysisBlocks = buildAnalysisBlocks(result, wordBand);
 
   return (
     <aside
@@ -55,47 +46,102 @@ export function ResultsPanel({
     >
       <header className="analysis-sidebar__head">
         <h2 className="analysis-sidebar__title">Analysis</h2>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="analysis-sidebar__download"
+          disabled={isPdfDownloading}
+          onClick={onDownloadReportPdf}
+        >
+          Download report
+        </Button>
       </header>
+
+      {reportPdfError ? (
+        <p className="analysis-sidebar__pdf-error" role="alert">
+          {reportPdfError}
+        </p>
+      ) : null}
 
       <div className="analysis-sidebar__body">
         <OverallScoreCard score={result.overall} animate={animate} />
         <ScoreGrid result={result} animate={animate} />
 
-        {showSummary && result.summary ? <p className="analysis-summary">{result.summary}</p> : null}
-
-        {showStructureCoach && result.structureCoach?.sections?.length > 0 ? (
-          <DiagnosticChecklistCard title="Essay structure" items={result.structureCoach.sections} />
-        ) : null}
-
-        {showTask1Checklist && task1Items.length > 0 ? (
-          <DiagnosticChecklistCard title="Task 1 checklist" items={task1Items} />
-        ) : null}
-
-        {showCriteria && result.criteria.length > 0 ? (
-          <div className="analysis-cards">
-            {result.criteria.map((criterion, index) => (
-              <article key={criterion.name} className="analysis-card" style={{ "--stagger": index }}>
-                <header className="analysis-card__head">
-                  <h3>{criterion.name}</h3>
-                  <span>{formatScore(criterion.score)}</span>
-                </header>
-                {criterion.description ? <p>{criterion.description}</p> : null}
-                {criterion.points?.length > 0 ? (
-                  <ul className="analysis-card__points">
-                    {criterion.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        ) : null}
-
-        <FeedbackSections result={result} showWordChoice={showWordChoice} />
+        {analysisBlocks.map((block) => (
+          <AnalysisBlock key={analysisBlockKey(block)} block={block} />
+        ))}
       </div>
     </aside>
   );
+}
+
+function analysisBlockKey(block) {
+  if (block.type === "summary") {
+    return "summary";
+  }
+
+  if (block.type === "diagnostic") {
+    return `diagnostic-${block.title}`;
+  }
+
+  if (block.type === "criteria") {
+    return "criteria";
+  }
+
+  return `changes-${block.title}`;
+}
+
+function AnalysisBlock({ block }) {
+  switch (block.type) {
+    case "summary":
+      return <p className="analysis-summary">{block.text}</p>;
+    case "diagnostic":
+      return <DiagnosticChecklistCard title={block.title} items={block.items} />;
+    case "criteria":
+      return (
+        <div className="analysis-cards">
+          {block.items.map((criterion, index) => (
+            <article key={criterion.name} className="analysis-card" style={{ "--stagger": index }}>
+              <header className="analysis-card__head">
+                <h3>{criterion.name}</h3>
+                <span>{formatScore(criterion.score)}</span>
+              </header>
+              {criterion.description ? <p>{criterion.description}</p> : null}
+              {criterion.points?.length > 0 ? (
+                <ul className="analysis-card__points">
+                  {criterion.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </article>
+          ))}
+        </div>
+      );
+    case "changes":
+      return (
+        <div className="analysis-cards">
+          <article className="analysis-card">
+            <header className="analysis-card__head">
+              <h3>{block.title}</h3>
+            </header>
+            <ul className="analysis-card__changes">
+              {block.items.map((item, index) => (
+                <li key={`${block.title}-${index}`}>
+                  <p>
+                    <del>{item.from}</del> → {item.to}
+                  </p>
+                  {item.reason ? <small>{item.reason}</small> : null}
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      );
+    default:
+      return null;
+  }
 }
 
 function DiagnosticChecklistCard({ title, items }) {
@@ -121,50 +167,5 @@ function DiagnosticChecklistCard({ title, items }) {
         ))}
       </ul>
     </article>
-  );
-}
-
-function FeedbackSections({ result, showWordChoice }) {
-  if (!showWordChoice || (result.corrections.length === 0 && result.improvedVocabulary.length === 0)) {
-    return null;
-  }
-
-  return (
-    <div className="analysis-cards">
-      {result.corrections.length > 0 ? (
-        <article className="analysis-card">
-          <header className="analysis-card__head">
-            <h3>Grammar fixes</h3>
-          </header>
-          <ul className="analysis-card__changes">
-            {result.corrections.map((correction) => (
-              <li key={`${correction.original}-${correction.revised}`}>
-                <p>
-                  <del>{correction.original}</del> → {correction.revised}
-                </p>
-                <small>{correction.reason}</small>
-              </li>
-            ))}
-          </ul>
-        </article>
-      ) : null}
-      {result.improvedVocabulary.length > 0 ? (
-        <article className="analysis-card">
-          <header className="analysis-card__head">
-            <h3>Word choice</h3>
-          </header>
-          <ul className="analysis-card__changes">
-            {result.improvedVocabulary.map((item) => (
-              <li key={`${item.original}-${item.suggestion}`}>
-                <p>
-                  <del>{item.original}</del> → {item.suggestion}
-                </p>
-                <small>{item.reason}</small>
-              </li>
-            ))}
-          </ul>
-        </article>
-      ) : null}
-    </div>
   );
 }

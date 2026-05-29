@@ -4,6 +4,7 @@ import { BrandMarkIcon } from "./components/icons/BrandMarkIcon";
 import { CheckerForm } from "./components/CheckerForm";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { ApiKeySettings } from "./components/ApiKeySettings";
+import { SiteFooter } from "./components/SiteFooter";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
 import { useTheme } from "./hooks/useTheme";
@@ -20,7 +21,6 @@ import {
   countWords,
   getSubmitState
 } from "./lib/scoring";
-
 export function App() {
   const { theme, toggleTheme } = useTheme();
   const [topic, setTopic] = useState("");
@@ -29,6 +29,9 @@ export function App() {
   const [options, setOptions] = useState(DEFAULT_OPTIONS);
   const [result, setResult] = useState(EMPTY_RESULT);
   const [error, setError] = useState("");
+  const [essayPdfError, setEssayPdfError] = useState("");
+  const [reportPdfError, setReportPdfError] = useState("");
+  const [isPdfDownloading, setIsPdfDownloading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [hasResult, setHasResult] = useState(false);
   const [animateResults, setAnimateResults] = useState(false);
@@ -96,6 +99,8 @@ export function App() {
     }
 
     setError("");
+    setEssayPdfError("");
+    setReportPdfError("");
     setIsChecking(true);
     setAnimateResults(false);
 
@@ -178,6 +183,53 @@ export function App() {
     });
   }
 
+  const reportPdfBase = {
+    theme,
+    topic,
+    questionImage,
+    essay,
+    taskType: options.taskType,
+    wordBand,
+    result,
+    wordCount
+  };
+
+  async function handleDownloadPdf(mode) {
+    if (isPdfDownloading) {
+      return;
+    }
+
+    if (mode === "essay" && !essay.trim()) {
+      return;
+    }
+
+    if (mode === "full" && !hasResult) {
+      return;
+    }
+
+    if (mode === "essay") {
+      setEssayPdfError("");
+    } else {
+      setReportPdfError("");
+    }
+
+    setIsPdfDownloading(true);
+
+    try {
+      const { downloadReportPdf } = await import("./lib/pdf/downloadReportPdf.jsx");
+      await downloadReportPdf({ ...reportPdfBase, mode });
+    } catch (downloadError) {
+      const message = downloadError.message || "Could not create PDF. Try again.";
+      if (mode === "essay") {
+        setEssayPdfError(message);
+      } else {
+        setReportPdfError(message);
+      }
+    } finally {
+      setIsPdfDownloading(false);
+    }
+  }
+
   return (
     <div className="app">
       <header className="site-bar">
@@ -230,19 +282,24 @@ export function App() {
               onClearEssay={() => setEssay("")}
               onSubmit={handleCheckScore}
               effectiveFeatureFlags={effectiveFeatureFlags}
+              onDownloadEssayPdf={() => handleDownloadPdf("essay")}
+              essayPdfError={essayPdfError}
+              isPdfDownloading={isPdfDownloading}
             />
           </section>
           <ResultsPanel
             result={result}
-            enabledFeatureFlags={effectiveFeatureFlags}
-            taskType={options.taskType}
             wordBand={wordBand}
             hasResult={hasResult}
             isChecking={isChecking}
             animate={animateResults}
+            onDownloadReportPdf={() => handleDownloadPdf("full")}
+            reportPdfError={reportPdfError}
+            isPdfDownloading={isPdfDownloading}
           />
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

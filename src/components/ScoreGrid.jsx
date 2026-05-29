@@ -1,17 +1,10 @@
 import { useAnimatedNumber } from "../hooks/useAnimatedNumber";
-import { formatScore, MAX_SCORE, normalizeScore } from "../lib/scoring";
-
-const CRITERIA = [
-  { key: "taskResponse", label: "TR", title: "Task response" },
-  { key: "coherenceCohesion", label: "CC", title: "Coherence" },
-  { key: "lexicalResource", label: "LR", title: "Lexical resource" },
-  { key: "grammarAccuracy", label: "GRA", title: "Grammar" }
-];
+import { formatScore, MAX_SCORE, normalizeScore, WRITING_CRITERIA } from "../lib/scoring";
 
 export function ScoreGrid({ result, animate }) {
   return (
     <div className="score-grid" role="list" aria-label="Criteria scores">
-      {CRITERIA.map((criterion, index) => (
+      {WRITING_CRITERIA.map((criterion, index) => (
         <ScoreCell
           key={criterion.key}
           label={criterion.label}

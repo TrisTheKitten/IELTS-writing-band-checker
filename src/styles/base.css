@@ -130,6 +130,57 @@ button:disabled {
   line-height: 1.15;
 }
 
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: var(--space-4) max(var(--layout-gutter), env(safe-area-inset-left, 0px))
+    max(var(--layout-gutter), env(safe-area-inset-right, 0px));
+  padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px));
+}
+
+.site-footer__inner {
+  max-width: var(--layout-max);
+  margin: 0 auto;
+}
+
+.site-footer__line {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.site-footer__sep {
+  margin-inline: var(--space-2);
+}
+
+.site-footer__link {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.site-footer__dev-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  vertical-align: middle;
+}
+
+.site-footer__github-icon {
+  flex-shrink: 0;
+}
+
+.site-footer__link:hover {
+  color: var(--text);
+}
+
+.site-footer__link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 .site-bar__right {
   display: flex;
   align-items: center;

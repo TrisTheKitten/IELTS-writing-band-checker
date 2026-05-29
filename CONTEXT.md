@@ -10,6 +10,8 @@
 | **Marked-up view** | Read-only rendering of the essay with inline highlights for wording fixes; editing stays in the default textarea tab. |
 | **Task 1 checklist** | Diagnostic yes/no items for Task 1 (Academic vs General templates). Word count is judged on the client. Always included on checks when Task 1 is selected. |
 | **Structure coach** | Diagnostic yes/no sections for Task 2 (introduction, body paragraphs, conclusion). Does not change numeric band scores. Always included on checks when Task 2 is selected. |
+| **PDF report** | Client-generated download after a Check. Includes the question (text or Task 1 image), plain essay, and full analysis from the sidebar. |
+| **Essay PDF** | Client-generated download of the question and plain essay only (no band scores or feedback). Available whenever the essay has text. |
 
 ## Task types
 

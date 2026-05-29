@@ -35,6 +35,13 @@ export {
 
 const WORD_BOUNDARY_PATTERN = /\s+/;
 
+export const WRITING_CRITERIA = [
+  { key: "taskResponse", label: "TR", title: "Task response" },
+  { key: "coherenceCohesion", label: "CC", title: "Coherence" },
+  { key: "lexicalResource", label: "LR", title: "Lexical resource" },
+  { key: "grammarAccuracy", label: "GRA", title: "Grammar" }
+];
+
 export const EMPTY_RESULT = {
   overall: 0,
   taskResponse: 0,

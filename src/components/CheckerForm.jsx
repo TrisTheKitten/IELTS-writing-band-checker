@@ -33,10 +33,14 @@ export function CheckerForm({
   onEndExam,
   onClearPrompt,
   onClearEssay,
-  onSubmit
+  onSubmit,
+  onDownloadEssayPdf,
+  essayPdfError,
+  isPdfDownloading
 }) {
   const usesQuestionImage = isTask1(options.taskType);
   const { canSubmit, showMinLengthHint, showTask1ImageHint } = submitState;
+  const canDownloadEssayPdf = essay.trim().length > 0;
 
   const costLine = useMemo(() => {
     const estimate = estimateCheckCost({
@@ -130,11 +134,28 @@ export function CheckerForm({
             {wordCount} {wordCount === 1 ? "word" : "words"}
             <span className="word-band__hint">{wordBand.label}</span>
           </span>
-          {showMinLengthHint ? (
-            <span className="form-hint">Min {MIN_ESSAY_LENGTH} characters</span>
-          ) : null}
+          <div className="input-box__footer-actions">
+            {showMinLengthHint ? (
+              <span className="form-hint">Min {MIN_ESSAY_LENGTH} characters</span>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!canDownloadEssayPdf || isPdfDownloading}
+              onClick={onDownloadEssayPdf}
+            >
+              Download essay
+            </Button>
+          </div>
         </div>
       </div>
+
+      {essayPdfError ? (
+        <p className="form-error" role="alert">
+          {essayPdfError}
+        </p>
+      ) : null}
 
       {showTask1ImageHint ? (
         <p className="form-hint">Upload the Task 1 question image to check your score.</p>
