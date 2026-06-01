@@ -103,7 +103,7 @@ export function WordLookupPanel() {
   return (
     <details className="word-lookup">
       <summary className="word-lookup__summary">
-        <Tooltip content={WORD_LOOKUP_TOOLTIP} portaled placement="top" align="start">
+        <Tooltip content={WORD_LOOKUP_TOOLTIP} hintTrigger="auto" placement="top" align="end">
           <span className="word-lookup__summary-label">Word lookup</span>
         </Tooltip>
       </summary>

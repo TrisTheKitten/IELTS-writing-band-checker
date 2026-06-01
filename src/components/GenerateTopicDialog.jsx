@@ -104,7 +104,7 @@ export function GenerateTopicDialog({
 
   return (
     <>
-      <Tooltip content={GENERATE_TOPIC_TOOLTIP} portaled placement="top" align="end">
+      <Tooltip content={GENERATE_TOPIC_TOOLTIP} hintTrigger="auto" placement="top" align="end">
         <Button
           type="button"
           variant="outline"

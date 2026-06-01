@@ -18,8 +18,21 @@ export function GeminiModelMenu({ geminiModelId, onSelectGeminiModel, disabled =
       className="dropdown-menu--gemini-model"
       triggerTooltip={GEMINI_MODEL_TRIGGER_TOOLTIP}
       trigger={
-        <button type="button" className="site-bar__control gemini-model-trigger" disabled={disabled}>
-          Model
+        <button
+          type="button"
+          className="site-bar__control gemini-model-trigger"
+          disabled={disabled}
+          aria-label="Gemini model"
+        >
+          <img
+            src="/gemini-icon.png"
+            alt=""
+            className="gemini-model-trigger__icon"
+            width={16}
+            height={16}
+            decoding="async"
+          />
+          <span className="gemini-model-trigger__label">Model</span>
         </button>
       }
     >

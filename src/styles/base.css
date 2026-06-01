@@ -186,14 +186,29 @@ button:disabled {
   --site-bar-control-height: 36px;
   --site-bar-switch-width: 54px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-3);
+  min-width: 0;
+  max-width: 100%;
 }
 
+.site-bar__right .dropdown-menu,
 .site-bar__right .tooltip-host {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.site-bar__right .tooltip-host {
   height: var(--site-bar-control-height);
+}
+
+.site-bar__right .tooltip-host--with-info {
+  gap: 0.125rem;
 }
 
 .site-bar__control {
@@ -269,6 +284,44 @@ html[data-theme="dark"] .site-bar__control:hover:not(:disabled) {
   height: 6px;
   border-radius: 50%;
   background: var(--success, #15803d);
+}
+
+.gemini-model-trigger__icon {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+@media (max-width: 520px) {
+  .site-bar__inner {
+    row-gap: var(--space-3);
+  }
+
+  .site-bar__right {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    gap: var(--space-2);
+  }
+
+  .site-bar__right .tooltip-info-trigger {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+
+  .settings-trigger__label,
+  .gemini-model-trigger__label {
+    display: none;
+  }
+
+  .settings-trigger,
+  .gemini-model-trigger {
+    width: var(--site-bar-switch-width);
+    padding-inline: 0;
+    justify-content: center;
+  }
+
 }
 
 .settings-dialog {

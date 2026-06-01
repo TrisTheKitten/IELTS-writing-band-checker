@@ -21,15 +21,9 @@
   list-style: none;
 }
 
-.word-lookup__summary .tooltip-trigger-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
 .word-lookup__summary-label {
-  display: inline-block;
+  flex: 1;
+  min-width: 0;
 }
 
 .word-lookup__summary::-webkit-details-marker {
@@ -677,10 +671,6 @@ html[data-theme="dark"] .exam-timer--time-up .exam-timer__clock {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-
-.option-checkbox--has-tooltip {
-  position: relative;
 }
 
 .option-checkbox {

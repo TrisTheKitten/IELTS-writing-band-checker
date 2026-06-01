@@ -46,17 +46,19 @@ export function ApiKeySettings() {
       <Tooltip
         align="end"
         placement="bottom"
+        hintTrigger="auto"
         content="Add your Gemini API key. Stored in this browser tab on your device only."
       >
         <button
           type="button"
           className="site-bar__control settings-trigger"
           onClick={openDialog}
+          aria-label="API key"
           aria-haspopup="dialog"
           aria-expanded={false}
         >
           <KeyRound size={16} strokeWidth={1.75} aria-hidden="true" />
-          <span>API key</span>
+          <span className="settings-trigger__label">API key</span>
           {hasKey ? <span className="settings-trigger__dot" aria-hidden="true" /> : null}
         </button>
       </Tooltip>

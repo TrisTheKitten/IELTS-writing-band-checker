@@ -3,7 +3,7 @@ import { Tooltip } from "./Tooltip";
 export function OptionCheckbox({ id, label, checked, onChange, variant = "card", tooltip }) {
   const checkbox = (
     <label
-      className={`option-checkbox option-checkbox--${variant}${checked ? " is-checked" : ""}${tooltip ? " option-checkbox--has-tooltip" : ""}`}
+      className={`option-checkbox option-checkbox--${variant}${checked ? " is-checked" : ""}`}
       htmlFor={id}
     >
       <input
@@ -38,7 +38,7 @@ export function OptionCheckbox({ id, label, checked, onChange, variant = "card",
   }
 
   return (
-    <Tooltip content={tooltip} portaled placement="top" align="start">
+    <Tooltip content={tooltip} hintTrigger="auto" placement="top" align="end">
       {checkbox}
     </Tooltip>
   );

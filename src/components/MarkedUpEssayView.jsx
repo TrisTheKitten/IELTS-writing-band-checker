@@ -23,7 +23,7 @@ export function MarkedUpEssayView({ essay, corrections, improvedVocabulary }) {
         );
 
         return (
-          <Tooltip key={`mark-${index}-${segment.value}`} content={tooltip} placement="top" portaled>
+          <Tooltip key={`mark-${index}-${segment.value}`} content={tooltip} placement="top" hintTrigger="target">
             <mark
               className={`marked-up-essay__mark marked-up-essay__mark--${segment.kind}`}
               tabIndex={0}
