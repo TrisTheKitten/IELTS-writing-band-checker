@@ -10,6 +10,7 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import { WorkspaceAnalysisToggle } from "./components/WorkspaceAnalysisToggle";
 import { DESKTOP_WORKSPACE_MEDIA, useMediaQuery } from "./hooks/useMediaQuery";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
+import { generateTopicQuestion } from "./lib/generateTopic";
 import { useTheme } from "./hooks/useTheme";
 import { useUiFont } from "./hooks/useUiFont";
 import { useGeminiModel } from "./hooks/useGeminiModel";
@@ -40,6 +41,8 @@ export function App() {
   const [reportPdfError, setReportPdfError] = useState("");
   const [isPdfDownloading, setIsPdfDownloading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
+  const [isGeneratingTopic, setIsGeneratingTopic] = useState(false);
+  const [topicError, setTopicError] = useState("");
   const [hasResult, setHasResult] = useState(false);
   const [animateResults, setAnimateResults] = useState(false);
   const [highlightSuggestions, setHighlightSuggestions] = useState(false);
@@ -92,6 +95,27 @@ export function App() {
       (result.corrections.length > 0 || result.improvedVocabulary.length > 0),
     [hasResult, effectiveFeatureFlags, result.corrections, result.improvedVocabulary]
   );
+
+  async function handleGenerateTopic() {
+    if (taskUsesQuestionImage || isGeneratingTopic || isChecking) {
+      return;
+    }
+
+    setTopicError("");
+    setIsGeneratingTopic(true);
+
+    try {
+      const question = await generateTopicQuestion({
+        model: geminiModelId,
+        previousTopic: topic
+      });
+      setTopic(question);
+    } catch (requestError) {
+      setTopicError(requestError.message);
+    } finally {
+      setIsGeneratingTopic(false);
+    }
+  }
 
   async function handleCheckScore() {
     const { canSubmit, blockReason } = getSubmitState({
@@ -165,6 +189,7 @@ export function App() {
       if (nextUsesImage !== currentUsesImage) {
         if (nextUsesImage) {
           setTopic("");
+          setTopicError("");
         } else {
           setQuestionImage(null);
         }
@@ -305,7 +330,11 @@ export function App() {
               onClearPrompt={() => {
                 setTopic("");
                 setQuestionImage(null);
+                setTopicError("");
               }}
+              onGenerateTopic={handleGenerateTopic}
+              isGeneratingTopic={isGeneratingTopic}
+              topicError={topicError}
               onClearEssay={() => setEssay("")}
               onSubmit={handleCheckScore}
               effectiveFeatureFlags={effectiveFeatureFlags}

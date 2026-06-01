@@ -215,11 +215,27 @@ button:disabled {
   flex-shrink: 0;
   appearance: none;
   -webkit-appearance: none;
-  transition: border-color var(--duration-fast) var(--ease-out);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
 }
 
-.site-bar__control:hover {
+.site-bar__control:hover:not(:disabled) {
   border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--surface) 94%, var(--text) 6%);
+  transform: translateY(var(--control-hover-lift));
+  box-shadow: var(--control-hover-shadow);
+}
+
+html[data-theme="dark"] .site-bar__control:hover:not(:disabled) {
+  box-shadow: var(--control-hover-shadow-dark);
+}
+
+.site-bar__control:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .site-bar__control:focus-visible {
@@ -229,6 +245,20 @@ button:disabled {
 
 .settings-trigger {
   position: relative;
+}
+
+.settings-trigger > svg {
+  flex-shrink: 0;
+  transform-origin: center;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.settings-trigger:hover:not(:disabled) > svg {
+  transform: rotate(-14deg) scale(1.1);
+}
+
+.settings-trigger:active:not(:disabled) > svg {
+  transform: rotate(0deg) scale(1);
 }
 
 .settings-trigger__dot {
@@ -487,7 +517,11 @@ button:disabled {
 }
 
 .theme-toggle:hover {
-  box-shadow: 0 1px 0 rgb(0 0 0 / 4%);
+  box-shadow: var(--control-hover-shadow);
+}
+
+html[data-theme="dark"] .theme-toggle:hover {
+  box-shadow: var(--control-hover-shadow-dark);
 }
 
 .theme-toggle:active .theme-toggle__track {
@@ -518,7 +552,10 @@ button:disabled {
   color: var(--text-faint);
   opacity: 0.35;
   pointer-events: none;
-  transition: opacity var(--duration-mid) var(--ease-out);
+  transform-origin: center;
+  transition:
+    opacity var(--duration-mid) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .theme-toggle__icon--sun {
@@ -537,6 +574,32 @@ button:disabled {
 
 .theme-toggle.is-dark .theme-toggle__icon--sun {
   opacity: 0.55;
+}
+
+.theme-toggle:hover:not(:disabled):not(.is-dark) .theme-toggle__icon--sun {
+  opacity: 0.5;
+  transform: translate(-50%, -50%) rotate(12deg) scale(1.12);
+}
+
+.theme-toggle:hover:not(:disabled).is-dark .theme-toggle__icon--moon {
+  opacity: 0.65;
+  transform: translate(-50%, -50%) rotate(-10deg) scale(1.12);
+}
+
+.theme-toggle:hover:not(:disabled):not(.is-dark) .theme-toggle__thumb-icon--sun {
+  transform: rotate(22deg) scale(1.12);
+}
+
+.theme-toggle:hover:not(:disabled).is-dark .theme-toggle__thumb-icon--moon {
+  transform: rotate(-18deg) scale(1.12);
+}
+
+.theme-toggle:active:not(:disabled):not(.is-dark) .theme-toggle__thumb-icon--sun {
+  transform: rotate(8deg) scale(1.04);
+}
+
+.theme-toggle:active:not(:disabled).is-dark .theme-toggle__thumb-icon--moon {
+  transform: rotate(-6deg) scale(1.04);
 }
 
 .theme-toggle__thumb {

@@ -9,6 +9,10 @@ import { ExamTimerBar } from "./ExamTimerBar";
 import { EssayEditorTabs } from "./EssayEditorTabs";
 import { WritingTextarea } from "./WritingTextarea";
 import { WordLookupPanel } from "./WordLookupPanel";
+import { Tooltip } from "./Tooltip";
+
+const GENERATE_TOPIC_TOOLTIP =
+  "Generate an IELTS Task 2 practice question with AI using your Gemini API key.";
 
 export function CheckerForm({
   topic,
@@ -34,6 +38,9 @@ export function CheckerForm({
   onExamModeChange,
   onEndExam,
   onClearPrompt,
+  onGenerateTopic,
+  isGeneratingTopic,
+  topicError,
   onClearEssay,
   onSubmit,
   onDownloadEssayPdf,
@@ -75,20 +82,67 @@ export function CheckerForm({
           onClear={onClearPrompt}
         />
       ) : (
-        <div className="input-box">
-          <label className="input-box__label" htmlFor="topic-input">
-            Topic
-          </label>
-          <WritingTextarea
-            id="topic-input"
-            className="input-box__field input-box__field--prompt"
-            value={topic}
-            onChange={onTopicChange}
-            placeholder="Paste the IELTS question here..."
-            rows={3}
-          />
+        <div
+          className={`input-box${isGeneratingTopic ? " input-box--generating" : ""}`}
+          aria-busy={isGeneratingTopic}
+        >
+          <div className="input-box__head">
+            <label className="input-box__label" htmlFor="topic-input">
+              Topic
+            </label>
+            <div className="input-box__head-actions">
+              <Tooltip
+                content={GENERATE_TOPIC_TOOLTIP}
+                portaled
+                placement="top"
+                align="end"
+              >
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isGeneratingTopic || isChecking}
+                  onClick={onGenerateTopic}
+                >
+                  {isGeneratingTopic ? "Generating…" : "Generate question"}
+                </Button>
+              </Tooltip>
+            </div>
+          </div>
+
+          <div className="input-box__prompt-wrap">
+            {isGeneratingTopic ? (
+              <div className="topic-generating" aria-hidden="true">
+                <span className="topic-generating__line topic-generating__line--short" />
+                <span className="topic-generating__line" />
+                <span className="topic-generating__line topic-generating__line--medium" />
+                <p className="topic-generating__status">Generating question…</p>
+              </div>
+            ) : null}
+            <WritingTextarea
+              id="topic-input"
+              className="input-box__field input-box__field--prompt"
+              value={topic}
+              onChange={onTopicChange}
+              placeholder="Paste the IELTS question here..."
+              rows={3}
+              disabled={isGeneratingTopic}
+            />
+          </div>
+
+          {topicError ? (
+            <p className="input-box__inline-error" role="alert">
+              {topicError}
+            </p>
+          ) : null}
+
           <div className="input-box__footer">
-            <button className="text-btn" type="button" onClick={onClearPrompt}>
+            <button
+              className="text-btn"
+              type="button"
+              onClick={onClearPrompt}
+              disabled={isGeneratingTopic}
+            >
               Clear
             </button>
           </div>

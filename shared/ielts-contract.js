@@ -1,4 +1,5 @@
 export const API_ENDPOINT = "/api/check-writing";
+export const GENERATE_TOPIC_ENDPOINT = "/api/generate-topic";
 
 export const MIN_ESSAY_LENGTH = 120;
 export const MAX_ESSAY_LENGTH = 12000;

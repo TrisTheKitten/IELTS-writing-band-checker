@@ -34,6 +34,27 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-bar__control:hover:not(:disabled),
+  .site-bar__control:active:not(:disabled),
+  .settings-trigger:hover:not(:disabled) > svg,
+  .settings-trigger:active:not(:disabled) > svg,
+  .theme-toggle:hover:not(:disabled) .theme-toggle__icon--sun,
+  .theme-toggle:hover:not(:disabled) .theme-toggle__icon--moon,
+  .theme-toggle:hover:not(:disabled) .theme-toggle__thumb-icon--sun,
+  .theme-toggle:hover:not(:disabled) .theme-toggle__thumb-icon--moon,
+  .theme-toggle:active:not(:disabled) .theme-toggle__thumb-icon--sun,
+  .theme-toggle:active:not(:disabled) .theme-toggle__thumb-icon--moon,
+  .theme-toggle:hover,
+  .option-checkbox--pill:hover,
+  .option-checkbox--pill:active,
+  .checker-form__submit:not(:disabled):hover,
+  .checker-form__submit:not(:disabled):active,
+  .input-box__head-actions [data-slot="button"]:not(:disabled):hover,
+  .input-box__head-actions [data-slot="button"]:not(:disabled):active {
+    transform: none;
+    box-shadow: none;
+  }
+
   .theme-toggle__track,
   .theme-toggle__thumb,
   .theme-toggle__icon {

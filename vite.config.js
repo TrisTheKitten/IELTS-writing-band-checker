@@ -6,6 +6,7 @@ import { defineConfig, loadEnv } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import checkWritingHandler from "./api/check-writing.js";
+import generateTopicHandler from "./api/generate-topic.js";
 import lookupWordHandler from "./api/lookup-word.js";
 
 function normalizeIncomingHeaders(headers) {
@@ -76,6 +77,12 @@ const API_ROUTES = [
     handler: lookupWordHandler,
     readBody: false,
     fallbackError: "Dictionary lookup failed."
+  },
+  {
+    path: "/api/generate-topic",
+    handler: generateTopicHandler,
+    readBody: true,
+    fallbackError: "Question generation failed."
   }
 ];
 
