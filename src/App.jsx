@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import { isFeatureEnabled, isTask1 } from "@shared/ielts-contract.js";
-import { BrandMarkIcon } from "./components/icons/BrandMarkIcon";
 import { CheckerForm } from "./components/CheckerForm";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { ApiKeySettings } from "./components/ApiKeySettings";
@@ -243,7 +242,7 @@ export function App() {
         <div className="site-bar__inner">
           <div className="site-bar__brand">
             <span className="site-bar__logo" aria-hidden="true">
-              <BrandMarkIcon />
+              <img src="/favicon.png" alt="" />
             </span>
             <div className="site-bar__text">
               <span className="site-bar__eyebrow">IELTS Writing</span>

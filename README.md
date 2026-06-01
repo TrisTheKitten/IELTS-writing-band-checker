@@ -132,8 +132,8 @@ Open **Model** in the header and pick Flash Lite, Flash, or Pro before checking.
 | Menu label | Model ID | Typical use |
 | --- | --- | --- |
 | Flash Lite | `gemini-3.1-flash-lite` | Fast checks, lowest API cost |
-| Flash | `gemini-3.5-flash` | Balanced speed, cost, and accuracy |
-| Pro | `gemini-3.1-pro` | Most careful band judgement, highest cost |
+| Flash | `gemini-3.5-flash` | Balanced speed, cost, and accuracy (`thinkingLevel: low`) |
+| Pro | `gemini-3.1-pro` | Most careful band judgement, highest cost (`thinkingLevel: medium`) |
 
 Resolution order on each request:
 

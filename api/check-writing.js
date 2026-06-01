@@ -15,6 +15,7 @@ import {
 } from "../shared/ielts-contract.js";
 import {
   getGeminiModelOption,
+  getGeminiThinkingConfig,
   isValidGeminiModelId,
   resolveGeminiModel
 } from "../shared/gemini-models.js";
@@ -156,6 +157,20 @@ export function buildResponseSchema(featureFlags, taskType = TASK_TYPES[0]) {
   };
 }
 
+export function buildGeminiGenerationConfig({ model, featureFlags, taskType }) {
+  const generationConfig = {
+    temperature: TEMPERATURE,
+    maxOutputTokens: RESPONSE_TOKEN_LIMIT,
+    responseMimeType: "application/json",
+    responseSchema: buildResponseSchema(featureFlags, taskType)
+  };
+  const thinkingConfig = getGeminiThinkingConfig(model);
+  if (thinkingConfig) {
+    generationConfig.thinkingConfig = thinkingConfig;
+  }
+  return generationConfig;
+}
+
 export default async function handler(request, response) {
   if (request.method !== HTTP_METHOD) {
     return sendJson(response, 405, { error: "Use POST to check a writing score." });
@@ -215,12 +230,7 @@ export default async function handler(request, response) {
           })
         }
       ],
-      generationConfig: {
-        temperature: TEMPERATURE,
-        maxOutputTokens: RESPONSE_TOKEN_LIMIT,
-        responseMimeType: "application/json",
-        responseSchema: buildResponseSchema(featureFlags, taskType)
-      }
+      generationConfig: buildGeminiGenerationConfig({ model, featureFlags, taskType })
     })
   });
 

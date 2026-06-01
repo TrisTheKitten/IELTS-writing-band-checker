@@ -1,5 +1,8 @@
 export const DEFAULT_GEMINI_MODEL_ID = "gemini-3.1-flash-lite";
 
+export const GEMINI_THINKING_LEVEL_LOW = "low";
+export const GEMINI_THINKING_LEVEL_MEDIUM = "medium";
+
 export const GEMINI_MODEL_OPTIONS = [
   {
     id: "gemini-3.1-flash-lite",
@@ -13,6 +16,7 @@ export const GEMINI_MODEL_OPTIONS = [
     id: "gemini-3.5-flash",
     label: "Flash",
     shortLabel: "Flash",
+    thinkingLevel: GEMINI_THINKING_LEVEL_LOW,
     menuHint: "Balanced · Medium cost",
     tooltip:
       "Typically under 15 seconds. Good balance of band accuracy and cost. Recommended for most essays."
@@ -21,6 +25,7 @@ export const GEMINI_MODEL_OPTIONS = [
     id: "gemini-3.1-pro",
     label: "Pro",
     shortLabel: "Pro",
+    thinkingLevel: GEMINI_THINKING_LEVEL_MEDIUM,
     menuHint: "Slowest · Highest cost",
     tooltip:
       "Can take 30 seconds or more. Highest API cost. Use when you want the most careful band judgement."
@@ -42,6 +47,14 @@ export function isValidGeminiModelId(id) {
 export function getGeminiModelOption(id) {
   const resolvedId = isValidGeminiModelId(id) ? String(id).trim() : DEFAULT_GEMINI_MODEL_ID;
   return GEMINI_MODEL_OPTIONS.find((option) => option.id === resolvedId) || GEMINI_MODEL_OPTIONS[0];
+}
+
+export function getGeminiThinkingConfig(modelId) {
+  const { thinkingLevel } = getGeminiModelOption(modelId);
+  if (!thinkingLevel) {
+    return null;
+  }
+  return { thinkingLevel };
 }
 
 export function resolveGeminiModel({ clientModel, envModel }) {

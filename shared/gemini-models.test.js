@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_GEMINI_MODEL_ID,
   GEMINI_MODEL_OPTIONS,
+  GEMINI_THINKING_LEVEL_LOW,
+  GEMINI_THINKING_LEVEL_MEDIUM,
   getGeminiModelOption,
+  getGeminiThinkingConfig,
   isValidGeminiModelId,
   resolveGeminiModel
 } from "./gemini-models.js";
@@ -66,5 +69,23 @@ describe("GEMINI_MODEL_OPTIONS copy", () => {
       expect(option.menuHint?.trim()).toBeTruthy();
       expect(option.tooltip?.trim()).toBeTruthy();
     }
+  });
+});
+
+describe("getGeminiThinkingConfig", () => {
+  it("uses low thinking for Flash", () => {
+    expect(getGeminiThinkingConfig("gemini-3.5-flash")).toEqual({
+      thinkingLevel: GEMINI_THINKING_LEVEL_LOW
+    });
+  });
+
+  it("uses medium thinking for Pro", () => {
+    expect(getGeminiThinkingConfig("gemini-3.1-pro")).toEqual({
+      thinkingLevel: GEMINI_THINKING_LEVEL_MEDIUM
+    });
+  });
+
+  it("omits thinking config for Flash Lite", () => {
+    expect(getGeminiThinkingConfig("gemini-3.1-flash-lite")).toBeNull();
   });
 });
