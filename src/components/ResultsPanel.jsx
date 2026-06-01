@@ -65,6 +65,9 @@ export function ResultsPanel({
       ) : null}
 
       <div className="analysis-sidebar__body">
+        {result.modelLabel ? (
+          <p className="analysis-sidebar__model">Scored with {result.modelLabel}</p>
+        ) : null}
         <OverallScoreCard score={result.overall} animate={animate} />
         <ScoreGrid result={result} animate={animate} />
 

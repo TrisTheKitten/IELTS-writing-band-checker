@@ -44,6 +44,13 @@
   padding: var(--space-5);
 }
 
+.analysis-sidebar__model {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
 .diagnostic-checklist__list {
   margin: 0;
   padding: 0;

@@ -13,9 +13,13 @@ import {
   STRUCTURE_COACH_SECTIONS,
   TASK_TYPES
 } from "../shared/ielts-contract.js";
+import {
+  getGeminiModelOption,
+  isValidGeminiModelId,
+  resolveGeminiModel
+} from "../shared/gemini-models.js";
 
 const GEMINI_API_VERSION = "v1beta";
-const DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite";
 const GEMINI_API_KEY_HEADER = "x-gemini-api-key";
 const GEMINI_ENDPOINT_BASE = "https://generativelanguage.googleapis.com";
 const HTTP_METHOD = "POST";
@@ -182,7 +186,14 @@ export default async function handler(request, response) {
     return sendJson(response, 400, { error: "Upload the Task 1 question image before checking." });
   }
 
-  const model = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+  const clientModel = String(body.model || "").trim();
+  if (clientModel && !isValidGeminiModelId(clientModel)) {
+    return sendJson(response, 400, { error: "Unsupported Gemini model." });
+  }
+  const model = resolveGeminiModel({
+    clientModel,
+    envModel: process.env.GEMINI_MODEL
+  });
   const endpoint = `${GEMINI_ENDPOINT_BASE}/${GEMINI_API_VERSION}/models/${model}:generateContent`;
   const geminiResponse = await fetch(endpoint, {
     method: HTTP_METHOD,
@@ -223,7 +234,11 @@ export default async function handler(request, response) {
 
   try {
     const text = geminiPayload.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    return sendJson(response, 200, JSON.parse(text));
+    return sendJson(response, 200, {
+      ...JSON.parse(text),
+      model,
+      modelLabel: getGeminiModelOption(model).label
+    });
   } catch {
     return sendJson(response, 502, { error: "Gemini returned an unreadable score response." });
   }

@@ -7,11 +7,13 @@ import {
   useRef,
   useState
 } from "react";
+import { Tooltip } from "../Tooltip.jsx";
 
 const DropdownMenuContext = createContext(null);
 
 export function DropdownMenu({
   trigger,
+  triggerTooltip,
   children,
   align = "end",
   menuLabel,
@@ -51,22 +53,37 @@ export function DropdownMenu({
     setOpen(false);
   }
 
+  const triggerButton = cloneElement(trigger, {
+    type: "button",
+    "aria-haspopup": "menu",
+    "aria-expanded": open,
+    "aria-controls": open ? menuId : undefined,
+    onClick: (event) => {
+      trigger.props.onClick?.(event);
+      setOpen((current) => !current);
+    }
+  });
+
+  const resolvedTrigger = triggerTooltip ? (
+    <Tooltip
+      content={triggerTooltip}
+      portaled
+      placement="bottom"
+      align={align === "start" ? "start" : "end"}
+    >
+      {triggerButton}
+    </Tooltip>
+  ) : (
+    triggerButton
+  );
+
   return (
     <DropdownMenuContext.Provider value={{ closeMenu }}>
       <div
         ref={rootRef}
         className={`dropdown-menu dropdown-menu--align-${align} ${className}`.trim()}
       >
-        {cloneElement(trigger, {
-          type: "button",
-          "aria-haspopup": "menu",
-          "aria-expanded": open,
-          "aria-controls": open ? menuId : undefined,
-          onClick: (event) => {
-            trigger.props.onClick?.(event);
-            setOpen((current) => !current);
-          }
-        })}
+        {resolvedTrigger}
         {open ? (
           <div
             id={menuId}
@@ -82,26 +99,49 @@ export function DropdownMenu({
   );
 }
 
-export function DropdownMenuItem({ children, selected = false, onSelect }) {
+export function DropdownMenuItem({
+  children,
+  hint,
+  tooltip,
+  selected = false,
+  onSelect
+}) {
   const { closeMenu } = useContext(DropdownMenuContext);
 
-  return (
+  const item = (
     <button
       type="button"
       role="menuitemradio"
       aria-checked={selected}
-      className={`dropdown-menu__item${selected ? " is-selected" : ""}`}
+      className={`dropdown-menu__item${selected ? " is-selected" : ""}${hint ? " dropdown-menu__item--with-hint" : ""}`}
       onClick={() => {
         onSelect();
         closeMenu();
       }}
     >
-      <span className="dropdown-menu__item-label">{children}</span>
+      <span className="dropdown-menu__item-body">
+        <span className="dropdown-menu__item-label">{children}</span>
+        {hint ? <span className="dropdown-menu__item-hint">{hint}</span> : null}
+      </span>
       {selected ? <span className="dropdown-menu__item-check" aria-hidden="true" /> : null}
     </button>
+  );
+
+  if (!tooltip) {
+    return item;
+  }
+
+  return (
+    <Tooltip content={tooltip} portaled placement="left" align="start">
+      {item}
+    </Tooltip>
   );
 }
 
 export function DropdownMenuLabel({ children }) {
   return <p className="dropdown-menu__heading">{children}</p>;
+}
+
+export function DropdownMenuDescription({ children }) {
+  return <p className="dropdown-menu__description">{children}</p>;
 }

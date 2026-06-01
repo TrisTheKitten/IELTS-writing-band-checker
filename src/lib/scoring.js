@@ -16,6 +16,7 @@ import {
   TASK_TYPE_OPTIONS,
   TASK_TYPES
 } from "@shared/ielts-contract.js";
+import { getGeminiModelOption } from "@shared/gemini-models.js";
 
 export {
   API_ENDPOINT,
@@ -53,7 +54,9 @@ export const EMPTY_RESULT = {
   corrections: [],
   improvedVocabulary: [],
   task1Checklist: [],
-  structureCoach: null
+  structureCoach: null,
+  model: "",
+  modelLabel: ""
 };
 
 export const DEFAULT_FEATURE_FLAGS = [
@@ -104,6 +107,8 @@ function normalizeChecklistItem(item) {
 
 export function normalizeResult(payload, enabledFlags = FEATURE_FLAG_IDS) {
   const flags = parseFeatureFlags(enabledFlags);
+  const modelId = String(payload.model || "").trim();
+  const modelOption = modelId ? getGeminiModelOption(modelId) : null;
 
   return {
     overall: normalizeScore(payload.overall),
@@ -133,7 +138,9 @@ export function normalizeResult(payload, enabledFlags = FEATURE_FLAG_IDS) {
         ? {
             sections: payload.structureCoach.sections.map(normalizeChecklistItem).filter(Boolean)
           }
-        : null
+        : null,
+    model: modelOption?.id || "",
+    modelLabel: payload.modelLabel || modelOption?.label || ""
   };
 }
 
