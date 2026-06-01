@@ -7,6 +7,7 @@ const LOADING_STEPS = [
 export function AnalysisLoading() {
   return (
     <aside
+      id="analysis-panel"
       className="analysis-sidebar analysis-sidebar--loading"
       aria-label="Analysis"
       aria-busy="true"

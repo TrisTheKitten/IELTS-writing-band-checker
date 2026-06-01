@@ -7,6 +7,8 @@ import { OptionPanel } from "./OptionPanel";
 import { PromptImageUpload } from "./PromptImageUpload";
 import { ExamTimerBar } from "./ExamTimerBar";
 import { EssayEditorTabs } from "./EssayEditorTabs";
+import { WritingTextarea } from "./WritingTextarea";
+import { WordLookupPanel } from "./WordLookupPanel";
 
 export function CheckerForm({
   topic,
@@ -77,11 +79,11 @@ export function CheckerForm({
           <label className="input-box__label" htmlFor="topic-input">
             Topic
           </label>
-          <textarea
+          <WritingTextarea
             id="topic-input"
             className="input-box__field input-box__field--prompt"
             value={topic}
-            onChange={(event) => onTopicChange(event.target.value)}
+            onChange={onTopicChange}
             placeholder="Paste the IELTS question here..."
             rows={3}
           />
@@ -120,11 +122,11 @@ export function CheckerForm({
           corrections={result.corrections}
           improvedVocabulary={result.improvedVocabulary}
         >
-          <textarea
+          <WritingTextarea
             id="essay-input"
             className="input-box__field input-box__field--essay"
             value={essay}
-            onChange={(event) => onEssayChange(event.target.value)}
+            onChange={onEssayChange}
             placeholder="Write your essay here..."
           />
         </EssayEditorTabs>
@@ -150,6 +152,8 @@ export function CheckerForm({
           </div>
         </div>
       </div>
+
+      <WordLookupPanel />
 
       {essayPdfError ? (
         <p className="form-error" role="alert">

@@ -22,7 +22,7 @@ export function ResultsPanel({
 
   if (!hasResult) {
     return (
-      <aside className="analysis-sidebar" aria-label="Analysis">
+      <aside id="analysis-panel" className="analysis-sidebar" aria-label="Analysis">
         <header className="analysis-sidebar__head">
           <h2 className="analysis-sidebar__title">Analysis</h2>
         </header>
@@ -40,6 +40,7 @@ export function ResultsPanel({
 
   return (
     <aside
+      id="analysis-panel"
       className={`analysis-sidebar ${animate ? "analysis-sidebar--animate" : ""}`}
       aria-label="Analysis"
       aria-live="polite"

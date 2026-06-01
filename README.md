@@ -1,6 +1,6 @@
 # IELTS Writing Band Checker
 
-Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Paste a prompt or upload a Task 1 question image, write your answer, and get estimated band scores with optional criteria feedback, corrections, and vocabulary suggestions.
+Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Paste a prompt or upload a Task 1 question image, write your answer, look up words while you draft, and get estimated band scores with optional criteria feedback, corrections, and vocabulary suggestions.
 
 **Live app (bring your own key):** [ielts-writing-band-checker.vercel.app](https://ielts-writing-band-checker.vercel.app/)
 
@@ -30,6 +30,7 @@ Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Pas
 
 ### Practice tools
 
+- **Word lookup** — collapsible panel below your essay (see [Word lookup](#word-lookup))
 - **Exam mode** — countdown timer (40 min for Task 2, 20 min for Task 1); advisory only, scoring stays available
 - **PDF downloads:**
   - Essay PDF — question and essay only
@@ -52,7 +53,8 @@ When you use your own API key, the checker shows a rough input-size estimate bef
 | Styling | Tailwind CSS 4, shadcn-style primitives |
 | PDF | `@react-pdf/renderer` (client-side) |
 | AI | [Google Gemini API](https://ai.google.dev/) — REST `generateContent` with JSON schema (`v1beta`) |
-| API | Serverless handler at [`api/check-writing.js`](api/check-writing.js) (Vercel-compatible) |
+| Dictionary | [Free Dictionary API](https://dictionaryapi.dev/) — English definitions, synonyms, and antonyms (via app proxy) |
+| API | Serverless handlers at [`api/check-writing.js`](api/check-writing.js) and [`api/lookup-word.js`](api/lookup-word.js) (Vercel-compatible) |
 | Tests | Vitest |
 
 No database. Shared contracts live in [`shared/`](shared/).
@@ -61,14 +63,16 @@ No database. Shared contracts live in [`shared/`](shared/).
 
 ```
 api/check-writing.js       # Gemini scoring endpoint
+api/lookup-word.js         # Dictionary API proxy
 shared/
   ielts-contract.js        # Task types, feature flags, validation limits
   gemini-models.js         # Allowlisted model IDs and labels
+  dictionary.js              # Word lookup validation and response normalization
 src/
   App.jsx                    # Main shell and check flow
-  components/                # UI (checker form, results, header menus)
-  hooks/                     # Theme, font, model, exam session
-  lib/                       # Scoring helpers, PDF, preferences
+  components/                # UI (checker form, results, WordLookupPanel, header menus)
+  hooks/                     # Theme, font, model, exam session, word lookup
+  lib/                       # Scoring helpers, PDF, dictionary client, preferences
 ```
 
 Domain terms are documented in [`CONTEXT.md`](CONTEXT.md).
@@ -99,7 +103,7 @@ Start the dev server:
 npm run dev
 ```
 
-Vite serves the app and proxies `/api/check-writing` to the same handler used in production — no separate API process.
+Vite serves the app and proxies `/api/check-writing` and `/api/lookup-word` to the same handlers used in production — no separate API process.
 
 ## Environment variables
 
@@ -165,7 +169,7 @@ Essay text, task options, and results are kept in memory only for the current se
 ## Scripts
 
 ```bash
-npm run dev      # Vite dev server + local /api/check-writing proxy
+npm run dev      # Vite dev server + local API proxies
 npm run build    # Production build to dist/
 npm run preview  # Preview the production build
 npm run lint     # ESLint
@@ -182,13 +186,34 @@ npm run test     # Vitest unit tests
 
 Feedback language is fixed to **English (UK)** (`DEFAULT_FEEDBACK_LANGUAGE` in [`shared/ielts-contract.js`](shared/ielts-contract.js)).
 
+## Word lookup
+
+Built-in English dictionary for drafting. It does **not** call Gemini and does **not** affect band scores.
+
+1. Expand **Word lookup** under your essay.
+2. Type a single English word and press **Look up** or Enter.
+3. The client GETs `/api/lookup-word?word=…`; the server proxies [Free Dictionary API](https://dictionaryapi.dev/) and returns a normalized JSON entry.
+4. Results show **synonyms** and **antonyms** first (when the API lists them), then an expandable **Definitions** section (up to two definitions per part of speech; stub entries like `(of people)` are omitted).
+
+| | |
+| --- | --- |
+| API key | None required |
+| Lookup type | Forward only — word → meanings (no reverse thesaurus) |
+| Input | Single word; letters, hyphens, and apostrophes only |
+| vs **Check** | Independent; available before and after scoring |
+| vs wording fixes | Gemini suggestions after a check; word lookup is student-initiated |
+
+Domain term: **Word lookup** in [`CONTEXT.md`](CONTEXT.md).
+
 ## Deployment
 
 Build the frontend with `npm run build`, then deploy to [Vercel](https://vercel.com/) or any platform with serverless functions:
 
 1. Import the repository.
 2. Set `GEMINI_API_KEY` and optionally `GEMINI_MODEL` in environment variables.
-3. Deploy. Vercel serves `dist/` and routes `/api/check-writing` to `api/check-writing.js`.
+3. Deploy. Vercel serves `dist/` and routes `/api/*` to the matching files under `api/`.
+
+Word lookup works out of the box on deploy — no extra environment variables.
 
 ## License
 

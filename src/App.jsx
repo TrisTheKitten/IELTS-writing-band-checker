@@ -7,6 +7,8 @@ import { FontFamilyMenu } from "./components/FontFamilyMenu";
 import { GeminiModelMenu } from "./components/GeminiModelMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { WorkspaceAnalysisToggle } from "./components/WorkspaceAnalysisToggle";
+import { DESKTOP_WORKSPACE_MEDIA, useMediaQuery } from "./hooks/useMediaQuery";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
 import { useTheme } from "./hooks/useTheme";
 import { useUiFont } from "./hooks/useUiFont";
@@ -41,6 +43,11 @@ export function App() {
   const [hasResult, setHasResult] = useState(false);
   const [animateResults, setAnimateResults] = useState(false);
   const [highlightSuggestions, setHighlightSuggestions] = useState(false);
+  const [analysisMinimized, setAnalysisMinimized] = useState(false);
+  const isDesktopWorkspace = useMediaQuery(DESKTOP_WORKSPACE_MEDIA);
+  const isAnalysisMinimized = isDesktopWorkspace && analysisMinimized;
+  const showAnalysisToggle = isDesktopWorkspace;
+  const showAnalysisPanel = !isAnalysisMinimized;
 
   const handleTimeUp = useCallback(() => {
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
@@ -263,8 +270,16 @@ export function App() {
       </header>
 
       <div className="tool-shell">
-        <div className="workspace">
+        <div
+          className={`workspace${isAnalysisMinimized ? " workspace--analysis-minimized" : ""}`}
+        >
           <section className="workspace__editor panel" aria-label="Writing checker">
+            {showAnalysisToggle ? (
+              <WorkspaceAnalysisToggle
+                minimized={isAnalysisMinimized}
+                onToggle={() => setAnalysisMinimized((current) => !current)}
+              />
+            ) : null}
             <CheckerForm
               topic={topic}
               questionImage={questionImage}
@@ -299,16 +314,18 @@ export function App() {
               isPdfDownloading={isPdfDownloading}
             />
           </section>
-          <ResultsPanel
-            result={result}
-            wordBand={wordBand}
-            hasResult={hasResult}
-            isChecking={isChecking}
-            animate={animateResults}
-            onDownloadReportPdf={() => handleDownloadPdf("full")}
-            reportPdfError={reportPdfError}
-            isPdfDownloading={isPdfDownloading}
-          />
+          {showAnalysisPanel ? (
+            <ResultsPanel
+              result={result}
+              wordBand={wordBand}
+              hasResult={hasResult}
+              isChecking={isChecking}
+              animate={animateResults}
+              onDownloadReportPdf={() => handleDownloadPdf("full")}
+              reportPdfError={reportPdfError}
+              isPdfDownloading={isPdfDownloading}
+            />
+          ) : null}
         </div>
       </div>
       <SiteFooter />
