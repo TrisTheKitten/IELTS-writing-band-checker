@@ -13,6 +13,8 @@
 | **Structure coach** | Diagnostic yes/no sections for Task 2 (introduction, body paragraphs, conclusion). Does not change numeric band scores. Always included on checks when Task 2 is selected. |
 | **PDF report** | Client-generated download after a Check. Includes the question (text or Task 1 image), plain essay, and full analysis from the sidebar. |
 | **Essay PDF** | Client-generated download of the question and plain essay only (no band scores or feedback). Available whenever the essay has text. |
+| **Generation theme** | Optional content area (e.g. Health) sent when generating a Task 2 question. Default **Any theme** lets the AI pick the theme. |
+| **Topic** | The question text in the Topic field — pasted, edited, or filled by generate. Not the same as generation theme. |
 
 ## Task types
 

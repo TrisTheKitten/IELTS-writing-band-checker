@@ -11,6 +11,10 @@ import { WorkspaceAnalysisToggle } from "./components/WorkspaceAnalysisToggle";
 import { DESKTOP_WORKSPACE_MEDIA, useMediaQuery } from "./hooks/useMediaQuery";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
 import { generateTopicQuestion } from "./lib/generateTopic";
+import {
+  getGenerateThemeId,
+  setGenerateThemeId
+} from "./lib/generateThemePreference";
 import { useTheme } from "./hooks/useTheme";
 import { useUiFont } from "./hooks/useUiFont";
 import { useGeminiModel } from "./hooks/useGeminiModel";
@@ -43,6 +47,7 @@ export function App() {
   const [isChecking, setIsChecking] = useState(false);
   const [isGeneratingTopic, setIsGeneratingTopic] = useState(false);
   const [topicError, setTopicError] = useState("");
+  const [generateThemeId, setGenerateThemeIdState] = useState(getGenerateThemeId);
   const [hasResult, setHasResult] = useState(false);
   const [animateResults, setAnimateResults] = useState(false);
   const [highlightSuggestions, setHighlightSuggestions] = useState(false);
@@ -96,10 +101,13 @@ export function App() {
     [hasResult, effectiveFeatureFlags, result.corrections, result.improvedVocabulary]
   );
 
-  async function handleGenerateTopic() {
+  async function handleGenerateTopic(themeId) {
     if (taskUsesQuestionImage || isGeneratingTopic || isChecking) {
       return;
     }
+
+    const resolvedThemeId = setGenerateThemeId(themeId);
+    setGenerateThemeIdState(resolvedThemeId);
 
     setTopicError("");
     setIsGeneratingTopic(true);
@@ -107,7 +115,8 @@ export function App() {
     try {
       const question = await generateTopicQuestion({
         model: geminiModelId,
-        previousTopic: topic
+        previousTopic: topic,
+        themeId: resolvedThemeId
       });
       setTopic(question);
     } catch (requestError) {
@@ -334,6 +343,7 @@ export function App() {
               }}
               onGenerateTopic={handleGenerateTopic}
               isGeneratingTopic={isGeneratingTopic}
+              generateThemeId={generateThemeId}
               topicError={topicError}
               onClearEssay={() => setEssay("")}
               onSubmit={handleCheckScore}

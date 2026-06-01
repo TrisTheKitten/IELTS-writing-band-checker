@@ -3,6 +3,7 @@ import {
   GENERATE_TOPIC_RESPONSE_SCHEMA,
   parseGeneratedTopic
 } from "../shared/generate-topic.js";
+import { resolveThemeId } from "../shared/task-themes.js";
 import {
   isValidGeminiModelId,
   resolveGeminiModel
@@ -31,6 +32,7 @@ export default async function handler(request, response) {
 
   const body = request.body || {};
   const previousTopic = String(body.previousTopic || "").trim().slice(0, MAX_PROMPT_LENGTH);
+  const themeId = resolveThemeId(body.themeId);
   const clientModel = String(body.model || "").trim();
 
   if (clientModel && !isValidGeminiModelId(clientModel)) {
@@ -52,7 +54,7 @@ export default async function handler(request, response) {
       contents: [
         {
           role: "user",
-          parts: [{ text: buildGenerateTopicPrompt({ previousTopic }) }]
+          parts: [{ text: buildGenerateTopicPrompt({ previousTopic, themeId }) }]
         }
       ],
       generationConfig: {

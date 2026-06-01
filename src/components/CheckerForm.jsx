@@ -9,10 +9,7 @@ import { ExamTimerBar } from "./ExamTimerBar";
 import { EssayEditorTabs } from "./EssayEditorTabs";
 import { WritingTextarea } from "./WritingTextarea";
 import { WordLookupPanel } from "./WordLookupPanel";
-import { Tooltip } from "./Tooltip";
-
-const GENERATE_TOPIC_TOOLTIP =
-  "Generate an IELTS Task 2 practice question with AI using your Gemini API key.";
+import { GenerateTopicDialog } from "./GenerateTopicDialog";
 
 export function CheckerForm({
   topic,
@@ -40,6 +37,7 @@ export function CheckerForm({
   onClearPrompt,
   onGenerateTopic,
   isGeneratingTopic,
+  generateThemeId,
   topicError,
   onClearEssay,
   onSubmit,
@@ -91,22 +89,12 @@ export function CheckerForm({
               Topic
             </label>
             <div className="input-box__head-actions">
-              <Tooltip
-                content={GENERATE_TOPIC_TOOLTIP}
-                portaled
-                placement="top"
-                align="end"
-              >
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={isGeneratingTopic || isChecking}
-                  onClick={onGenerateTopic}
-                >
-                  {isGeneratingTopic ? "Generating…" : "Generate question"}
-                </Button>
-              </Tooltip>
+              <GenerateTopicDialog
+                disabled={isChecking}
+                isGenerating={isGeneratingTopic}
+                generateThemeId={generateThemeId}
+                onGenerate={onGenerateTopic}
+              />
             </div>
           </div>
 

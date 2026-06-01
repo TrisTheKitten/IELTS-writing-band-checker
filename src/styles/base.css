@@ -438,6 +438,96 @@ html[data-theme="dark"] .site-bar__control:hover:not(:disabled) {
   border-color: var(--border-strong);
 }
 
+.generate-dialog {
+  width: min(100% - var(--space-6), 24rem);
+  max-height: min(85dvh, 34rem);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.generate-dialog::backdrop {
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+.generate-dialog__panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: min(85dvh, 34rem);
+}
+
+.generate-dialog button {
+  font-family: var(--font-sans);
+}
+
+.generate-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.generate-dialog__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.generate-dialog__close {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.generate-dialog__close:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--accent-subtle);
+}
+
+.generate-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: var(--space-4) var(--space-5);
+  overflow-y: auto;
+}
+
+.generate-dialog__lead {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.generate-dialog__actions {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.generate-dialog__submit {
+  min-width: 10rem;
+  min-height: 2.5rem;
+  padding-inline: var(--space-6);
+}
+
 .tool-shell {
   flex: 1;
   max-width: var(--layout-max);

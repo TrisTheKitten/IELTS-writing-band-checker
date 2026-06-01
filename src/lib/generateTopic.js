@@ -2,7 +2,7 @@ import { GENERATE_TOPIC_ENDPOINT } from "@shared/ielts-contract.js";
 import { readJsonPayload } from "./scoring";
 import { buildGeminiApiKeyHeaders } from "./geminiApiKey";
 
-export async function generateTopicQuestion({ model, previousTopic = "" }) {
+export async function generateTopicQuestion({ model, previousTopic = "", themeId } = {}) {
   const response = await fetch(GENERATE_TOPIC_ENDPOINT, {
     method: "POST",
     headers: {
@@ -11,7 +11,8 @@ export async function generateTopicQuestion({ model, previousTopic = "" }) {
     },
     body: JSON.stringify({
       model,
-      previousTopic
+      previousTopic,
+      themeId
     })
   });
 

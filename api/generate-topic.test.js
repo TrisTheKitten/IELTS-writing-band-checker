@@ -3,6 +3,7 @@ import {
   buildGenerateTopicPrompt,
   parseGeneratedTopic
 } from "../shared/generate-topic.js";
+import { ANY_THEME_ID, resolveThemeId } from "../shared/task-themes.js";
 import handler from "./generate-topic.js";
 
 function createResponse() {
@@ -32,6 +33,28 @@ describe("buildGenerateTopicPrompt", () => {
 
     expect(prompt).toContain("different");
     expect(prompt).toContain("Some old question");
+  });
+
+  it("steers the theme when a generation theme is selected", () => {
+    const prompt = buildGenerateTopicPrompt({ themeId: "technology" });
+
+    expect(prompt).toContain('theme "Technology"');
+    expect(prompt).toContain("internet");
+    expect(prompt).toContain("AI");
+  });
+
+  it("keeps varied-theme guidance when theme is any and there is no previous topic", () => {
+    const prompt = buildGenerateTopicPrompt({ themeId: ANY_THEME_ID });
+
+    expect(prompt).toContain("varied");
+    expect(prompt).not.toContain('theme "');
+  });
+});
+
+describe("resolveThemeId", () => {
+  it("falls back unknown ids to any", () => {
+    expect(resolveThemeId("not-a-theme")).toBe(ANY_THEME_ID);
+    expect(resolveThemeId("health")).toBe("health");
   });
 });
 
