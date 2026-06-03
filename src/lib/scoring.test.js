@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildResponseSchema } from "../../api/check-writing.js";
+import { buildPrompt, buildResponseSchema } from "../../api/check-writing.js";
 import {
   getSubmitBlockReason,
   getSubmitState,
@@ -134,6 +134,37 @@ describe("getSubmitBlockReason", () => {
         isChecking: false
       })
     ).toBeNull();
+  });
+});
+
+describe("buildPrompt", () => {
+  it("uses neutral examiner calibration", () => {
+    const prompt = buildPrompt({
+      essay: "Sample essay text.",
+      topic: "Technology",
+      taskType: "IELTS Writing Task 2",
+      aiLanguage: "English (UK)",
+      featureFlags: [],
+      hasQuestionImage: false
+    });
+
+    expect(prompt).toContain("standard IELTS writing examiner");
+    expect(prompt).not.toContain("strict");
+    expect(prompt).toContain("Do not inflate or deflate bands");
+  });
+
+  it("allows empty correction arrays when wording fixes are enabled", () => {
+    const prompt = buildPrompt({
+      essay: "Sample essay text.",
+      topic: "Technology",
+      taskType: "IELTS Writing Task 2",
+      aiLanguage: "English (UK)",
+      featureFlags: ["improveWordChoice"],
+      hasQuestionImage: false
+    });
+
+    expect(prompt).toContain("realistically affect the band");
+    expect(prompt).toContain("Use empty arrays");
   });
 });
 

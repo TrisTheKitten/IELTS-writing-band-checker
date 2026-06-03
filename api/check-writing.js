@@ -276,9 +276,10 @@ function buildGeminiParts({ essay, topic, taskType, aiLanguage, featureFlags, qu
 export function buildPrompt({ essay, topic, taskType, aiLanguage, featureFlags, hasQuestionImage }) {
   const flags = parseFeatureFlags(featureFlags);
   const lines = [
-    "Act as a strict IELTS writing examiner.",
+    "Act as a standard IELTS writing examiner.",
     "Return only valid JSON that matches the provided schema.",
     "Use IELTS public band descriptors for Task Response or Task Achievement, Coherence and Cohesion, Lexical Resource, and Grammatical Range and Accuracy.",
+    "Score faithfully to those descriptors. Do not inflate or deflate bands.",
     "Scores must be IELTS half-band values from 0 to 9.",
     "Keep feedback concise and practical for a student.",
     "Do not write sample essays, model answers, or rewritten full essays.",
@@ -308,8 +309,9 @@ export function buildPrompt({ essay, topic, taskType, aiLanguage, featureFlags, 
 
   if (isFeatureEnabled(flags, "improveWordChoice")) {
     lines.push(
-      "List specific grammar fixes in corrections (original phrase, revised phrase, reason).",
-      "List lexical upgrades in improvedVocabulary (original word or phrase, stronger suggestion, reason).",
+      "List grammar fixes in corrections only where they would realistically affect the band (original phrase, revised phrase, reason).",
+      "List lexical upgrades in improvedVocabulary only where they would realistically affect the band (original word or phrase, stronger suggestion, reason).",
+      "Use empty arrays when there are no meaningful issues at this band level.",
       "Do not rewrite the full essay."
     );
   }
