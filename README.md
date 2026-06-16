@@ -26,6 +26,7 @@ Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Pas
   - Task 1 checklist — overview, trends, or letter requirements
   - Essay structure — Task 2 intro, body paragraphs, and conclusion
 - **Marked-up essay view** — inline highlights for wording fixes after a check
+- **Vocabulary repetition** — counts repeated content words in the checked essay; click a word for dictionary synonyms (does not affect band scores)
 - **Word-count band** — advisory red / amber / green indicator by task type (does not block submit)
 
 ### Practice tools

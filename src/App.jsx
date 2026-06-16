@@ -357,6 +357,7 @@ export function App() {
             <ResultsPanel
               result={result}
               wordBand={wordBand}
+              essay={essay}
               hasResult={hasResult}
               isChecking={isChecking}
               animate={animateResults}

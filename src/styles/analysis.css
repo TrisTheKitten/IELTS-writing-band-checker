@@ -695,6 +695,97 @@ html[data-theme="dark"] .diagnostic-checklist__item.is-met .diagnostic-checklist
 .analysis-card__changes li {
   overflow-wrap: anywhere;
 }
+
+.vocab-repetition__lead {
+  margin: 0 0 var(--space-3);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.vocab-repetition__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.vocab-repetition__item {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.vocab-repetition__word {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--sidebar-card);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.vocab-repetition__word:hover {
+  border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--sidebar-card) 90%, var(--text) 10%);
+}
+
+.vocab-repetition__word.is-expanded {
+  border-color: var(--border-strong);
+}
+
+.vocab-repetition__chevron {
+  flex: none;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.vocab-repetition__word.is-expanded .vocab-repetition__chevron {
+  transform: rotate(90deg);
+}
+
+.vocab-repetition__term {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.vocab-repetition__count {
+  flex: none;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--track);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.vocab-repetition__synonyms {
+  padding: 0 var(--space-3) var(--space-1) calc(var(--space-3) + 1rem + var(--space-2));
+}
+
+.vocab-repetition__synonyms-status {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.vocab-repetition__synonyms-status--error {
+  color: var(--danger);
+}
 @media (max-width: 1023px) {
   .input-box__field--essay {
     min-height: 240px;

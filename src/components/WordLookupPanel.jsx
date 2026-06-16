@@ -1,26 +1,11 @@
 import { useId } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "./Tooltip";
+import { WordChipList } from "./WordChipList";
 import { useWordLookup } from "../hooks/useWordLookup";
 
 const WORD_LOOKUP_TOOLTIP =
   "Type a word and press Look up for synonyms, antonyms, and definitions.";
-
-function WordChipList({ items }) {
-  if (!items.length) {
-    return null;
-  }
-
-  return (
-    <ul className="word-lookup__chips">
-      {items.map((item) => (
-        <li key={item} className="word-lookup__chip">
-          {item}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 function LookupResults({ entry }) {
   const hasDefinitions = entry.meanings.some((meaning) => meaning.definitions.length > 0);

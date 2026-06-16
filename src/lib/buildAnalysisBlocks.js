@@ -1,58 +1,106 @@
 import { buildTask1ChecklistDisplayItems } from "./checklistDisplay.js";
+import { analyzeVocabularyRepetition } from "./vocabularyRepetition.js";
 
-export function buildAnalysisBlocks(result, wordBand) {
-  const blocks = [];
-
-  if (result.summary) {
-    blocks.push({ type: "summary", text: result.summary });
+function buildSummaryBlock(result) {
+  if (!result.summary) {
+    return null;
   }
 
-  if (result.structureCoach?.sections?.length > 0) {
-    blocks.push({
-      type: "diagnostic",
-      title: "Essay structure",
-      items: result.structureCoach.sections
-    });
+  return { type: "summary", text: result.summary };
+}
+
+function buildStructureCoachBlock(result) {
+  if (!result.structureCoach?.sections?.length) {
+    return null;
   }
 
-  if (result.task1Checklist?.length > 0) {
-    const items = buildTask1ChecklistDisplayItems(result.task1Checklist, wordBand);
-    if (items.length > 0) {
-      blocks.push({
-        type: "diagnostic",
-        title: "Task 1 checklist",
-        items
-      });
-    }
+  return {
+    type: "diagnostic",
+    title: "Essay structure",
+    items: result.structureCoach.sections
+  };
+}
+
+function buildGrammarFixesBlock(result) {
+  if (!result.corrections?.length) {
+    return null;
   }
 
-  if (result.criteria?.length > 0) {
-    blocks.push({ type: "criteria", items: result.criteria });
+  return {
+    type: "changes",
+    title: "Grammar fixes",
+    items: result.corrections.map((item) => ({
+      from: item.original,
+      to: item.revised,
+      reason: item.reason || ""
+    }))
+  };
+}
+
+function buildWordChoiceBlock(result) {
+  if (!result.improvedVocabulary?.length) {
+    return null;
   }
 
-  if (result.corrections?.length > 0) {
-    blocks.push({
-      type: "changes",
-      title: "Grammar fixes",
-      items: result.corrections.map((item) => ({
-        from: item.original,
-        to: item.revised,
-        reason: item.reason || ""
-      }))
-    });
+  return {
+    type: "changes",
+    title: "Word choice",
+    items: result.improvedVocabulary.map((item) => ({
+      from: item.original,
+      to: item.suggestion,
+      reason: item.reason || ""
+    }))
+  };
+}
+
+function buildVocabularyRepetitionBlock(essay) {
+  const vocabularyRepetition = analyzeVocabularyRepetition(essay);
+
+  if (!vocabularyRepetition.items.length) {
+    return null;
   }
 
-  if (result.improvedVocabulary?.length > 0) {
-    blocks.push({
-      type: "changes",
-      title: "Word choice",
-      items: result.improvedVocabulary.map((item) => ({
-        from: item.original,
-        to: item.suggestion,
-        reason: item.reason || ""
-      }))
-    });
+  return {
+    type: "vocabularyRepetition",
+    title: "Vocabulary repetition",
+    items: vocabularyRepetition.items
+  };
+}
+
+function buildTask1ChecklistBlock(result, wordBand) {
+  if (!result.task1Checklist?.length) {
+    return null;
   }
 
-  return blocks;
+  const items = buildTask1ChecklistDisplayItems(result.task1Checklist, wordBand);
+
+  if (!items.length) {
+    return null;
+  }
+
+  return {
+    type: "diagnostic",
+    title: "Task 1 checklist",
+    items
+  };
+}
+
+function buildCriteriaBlock(result) {
+  if (!result.criteria?.length) {
+    return null;
+  }
+
+  return { type: "criteria", items: result.criteria };
+}
+
+export function buildAnalysisBlocks(result, wordBand, essay = "") {
+  return [
+    buildSummaryBlock(result),
+    buildStructureCoachBlock(result),
+    buildGrammarFixesBlock(result),
+    buildWordChoiceBlock(result),
+    buildVocabularyRepetitionBlock(essay),
+    buildTask1ChecklistBlock(result, wordBand),
+    buildCriteriaBlock(result)
+  ].filter(Boolean);
 }

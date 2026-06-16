@@ -1,15 +1,18 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ImageUp } from "lucide-react";
-import { readQuestionImageFile, QUESTION_IMAGE_ACCEPT } from "../lib/questionImage";
+import {
+  getPastedQuestionImageFile,
+  readQuestionImageFile,
+  QUESTION_IMAGE_ACCEPT,
+  shouldDeferPastedImageToTextField
+} from "../lib/questionImage";
 
 export function PromptImageUpload({ image, onImageChange, onClear }) {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [localError, setLocalError] = useState("");
 
-  async function handleFiles(fileList) {
-    const file = fileList?.[0];
-
+  async function handleFile(file) {
     if (!file) {
       return;
     }
@@ -23,6 +26,47 @@ export function PromptImageUpload({ image, onImageChange, onClear }) {
       setLocalError(readError.message);
     }
   }
+
+  async function handleFiles(fileList) {
+    await handleFile(fileList?.[0]);
+  }
+
+  const handlePaste = useCallback(
+    async (event) => {
+      const file = getPastedQuestionImageFile(event.clipboardData);
+
+      if (!file) {
+        return;
+      }
+
+      if (shouldDeferPastedImageToTextField(event.clipboardData, document.activeElement)) {
+        return;
+      }
+
+      event.preventDefault();
+      setLocalError("");
+
+      try {
+        const nextImage = await readQuestionImageFile(file);
+        onImageChange(nextImage);
+      } catch (readError) {
+        setLocalError(readError.message);
+      }
+    },
+    [onImageChange]
+  );
+
+  useEffect(() => {
+    if (image) {
+      return undefined;
+    }
+
+    document.addEventListener("paste", handlePaste);
+
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, [image, handlePaste]);
 
   function handleInputChange(event) {
     handleFiles(event.target.files);
@@ -89,7 +133,9 @@ export function PromptImageUpload({ image, onImageChange, onClear }) {
       >
         <ImageUp size={22} strokeWidth={1.75} aria-hidden="true" />
         <p className="prompt-image__title">Drop image here</p>
-        <p className="prompt-image__hint">or click to upload · JPG, PNG, WebP, GIF · max 4 MB</p>
+        <p className="prompt-image__hint">
+          or paste, click to upload · JPG, PNG, WebP, GIF · max 4 MB
+        </p>
         <input
           ref={inputRef}
           type="file"

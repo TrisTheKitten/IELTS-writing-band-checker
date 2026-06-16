@@ -6,6 +6,7 @@
 | --- | --- |
 | **Check** | One POST to `/api/check-writing` returning band scores and optional feedback sections. |
 | **Word lookup** | Student-initiated English dictionary search while drafting. Uses [Free Dictionary API](https://dictionaryapi.dev/); does not run a **Check** or change band scores. Not the same as post-check word-choice suggestions. |
+| **Vocabulary repetition** | Client-side count of repeated content words in the checked essay. Shown in the analysis sidebar after a Check. Clicking a word fetches dictionary synonyms; does not change band scores. Distinct from **Word lookup** (drafting search) and **Word choice** (AI suggestions). |
 | **Exam session** | User-enabled practice mode with a countdown (40 min for Task 2, 20 min for Task 1). The timer is informational; scoring is not restricted. |
 | **Word band** | Client-only advisory color (red, amber, green) from task-specific word-count thresholds. Never blocks submit. |
 | **Marked-up view** | Read-only rendering of the essay with inline highlights for wording fixes; editing stays in the default textarea tab. |

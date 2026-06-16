@@ -2,6 +2,7 @@ import { AnalysisEmptyPreview } from "./AnalysisEmptyPreview";
 import { AnalysisLoading } from "./AnalysisLoading";
 import { OverallScoreCard } from "./OverallScoreCard";
 import { ScoreGrid } from "./ScoreGrid";
+import { VocabularyRepetitionCard } from "./VocabularyRepetitionCard";
 import { Button } from "@/components/ui/button";
 import { buildAnalysisBlocks } from "../lib/buildAnalysisBlocks";
 import { formatScore } from "../lib/scoring";
@@ -9,6 +10,7 @@ import { formatScore } from "../lib/scoring";
 export function ResultsPanel({
   result,
   wordBand,
+  essay,
   hasResult,
   isChecking,
   animate,
@@ -36,7 +38,7 @@ export function ResultsPanel({
     );
   }
 
-  const analysisBlocks = buildAnalysisBlocks(result, wordBand);
+  const analysisBlocks = buildAnalysisBlocks(result, wordBand, essay);
 
   return (
     <aside
@@ -93,6 +95,10 @@ function analysisBlockKey(block) {
     return "criteria";
   }
 
+  if (block.type === "vocabularyRepetition") {
+    return "vocabulary-repetition";
+  }
+
   return `changes-${block.title}`;
 }
 
@@ -143,6 +149,8 @@ function AnalysisBlock({ block }) {
           </article>
         </div>
       );
+    case "vocabularyRepetition":
+      return <VocabularyRepetitionCard title={block.title} items={block.items} />;
     default:
       return null;
   }

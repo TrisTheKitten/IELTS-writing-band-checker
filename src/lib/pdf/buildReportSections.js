@@ -136,7 +136,7 @@ export function buildReportSections({
     criteria: criteriaScores
   });
 
-  const analysisBlocks = buildAnalysisBlocks(result, wordBand);
+  const analysisBlocks = buildAnalysisBlocks(result, wordBand, trimmedEssay);
 
   for (let index = 0; index < analysisBlocks.length; index += 1) {
     const pdfSection = analysisBlockToPdfSection(analysisBlocks[index], index, analysisBlocks);

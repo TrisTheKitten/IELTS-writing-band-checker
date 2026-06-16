@@ -10,6 +10,52 @@ export function isAcceptedQuestionImage(file) {
   return file && ACCEPTED_QUESTION_IMAGE_MIME_TYPES.has(file.type);
 }
 
+function isTextEntryElement(element) {
+  if (!element || typeof element !== "object") {
+    return false;
+  }
+
+  const tagName = element.tagName?.toLowerCase();
+
+  return tagName === "textarea" || tagName === "input" || element.isContentEditable === true;
+}
+
+export function getPastedQuestionImageFile(clipboardData) {
+  const items = clipboardData?.items;
+
+  if (!items) {
+    return null;
+  }
+
+  for (const item of items) {
+    if (item.kind !== "file") {
+      continue;
+    }
+
+    const file = item.getAsFile();
+
+    if (isAcceptedQuestionImage(file)) {
+      return file;
+    }
+  }
+
+  return null;
+}
+
+export function shouldDeferPastedImageToTextField(clipboardData, activeElement) {
+  if (!isTextEntryElement(activeElement)) {
+    return false;
+  }
+
+  const items = clipboardData?.items;
+
+  if (!items) {
+    return false;
+  }
+
+  return [...items].some((item) => item.kind === "string" && item.type === "text/plain");
+}
+
 export function readQuestionImageFile(file) {
   if (!file) {
     return Promise.reject(new Error("No file selected."));
