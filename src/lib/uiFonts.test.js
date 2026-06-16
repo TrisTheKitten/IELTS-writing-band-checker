@@ -24,8 +24,17 @@ describe("uiFonts", () => {
     expect(pdfFonts.bold).toBe("Times-Bold");
   });
 
+  it("maps lora to weight-based bold styles in pdf", () => {
+    const pdfFonts = getUiFontPdfFonts("lora");
+    expect(pdfFonts.body).toBe("Lora");
+    expect(pdfFonts.boldUsesWeight).toBe(true);
+    expect(pdfFonts.register).toHaveLength(2);
+  });
+
   it("validates known font ids", () => {
     expect(isValidUiFontId("arial")).toBe(true);
+    expect(isValidUiFontId("lora")).toBe(true);
+    expect(isValidUiFontId("comic-sans")).toBe(true);
     expect(isValidUiFontId("nope")).toBe(false);
   });
 });

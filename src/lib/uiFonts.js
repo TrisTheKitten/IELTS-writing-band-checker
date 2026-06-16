@@ -52,6 +52,33 @@ export const UI_FONT_OPTIONS = [
     label: "Georgia",
     cssValue: 'Georgia, "Times New Roman", Times, serif',
     pdf: { body: "Times-Roman", bold: "Times-Bold", boldUsesWeight: false }
+  },
+  {
+    id: "lora",
+    label: "Lora",
+    cssValue: '"Lora", Georgia, "Times New Roman", serif',
+    googleFontQuery: "family=Lora:wght@400;500;600;700",
+    pdf: {
+      body: "Lora",
+      bold: "Lora",
+      boldUsesWeight: true,
+      register: [
+        {
+          src: "https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787weuyJG.ttf",
+          fontWeight: 400
+        },
+        {
+          src: "https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787z5vCJG.ttf",
+          fontWeight: 700
+        }
+      ]
+    }
+  },
+  {
+    id: "comic-sans",
+    label: "Comic Sans MS",
+    cssValue: '"Comic Sans MS", "Comic Sans", cursive',
+    pdf: { body: "Helvetica", bold: "Helvetica-Bold", boldUsesWeight: false }
   }
 ];
 

@@ -41,7 +41,7 @@ Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Pas
 
 - **Model** — header menu to pick Flash Lite, Flash, or Pro (see [Gemini models](#gemini-models)); active model shown in the analysis sidebar after a check
 - **API key** — paste your Gemini key for this browser tab (BYOK)
-- **UI font** — Helvetica Neue, System UI, Arial, Segoe UI, Inter, or Georgia (applies to the app and PDFs)
+- **UI font** — Helvetica Neue, System UI, Arial, Segoe UI, Inter, Georgia, Lora, or Comic Sans MS (applies to the app and PDFs)
 - **Theme** — light or dark
 
 When you use your own API key, the checker shows a rough input-size estimate before each check.
