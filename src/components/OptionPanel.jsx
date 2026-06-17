@@ -8,7 +8,7 @@ export function OptionPanel({ options, onOptionChange, onToggleFeature, onExamMo
         <p className="option-panel__title" id="task-type-label">
           Task
         </p>
-        <div className="task-segments" role="radiogroup" aria-labelledby="task-type-label">
+        <div className="task-segments" role="radiogroup" aria-labelledby="task-type-label" data-tour="task-type">
           {TASK_TYPE_OPTIONS.map((taskOption) => {
             const isSelected = options.taskType === taskOption.value;
 

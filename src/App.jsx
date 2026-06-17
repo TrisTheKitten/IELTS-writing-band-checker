@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { HelpCircle } from "lucide-react";
 import { isFeatureEnabled, isTask1 } from "@shared/ielts-contract.js";
 import { CheckerForm } from "./components/CheckerForm";
 import { ResultsPanel } from "./components/ResultsPanel";
@@ -7,8 +8,11 @@ import { FontFamilyMenu } from "./components/FontFamilyMenu";
 import { GeminiModelMenu } from "./components/GeminiModelMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { Tooltip } from "./components/Tooltip";
+import { TutorialTour } from "./components/TutorialTour";
 import { WorkspaceAnalysisToggle } from "./components/WorkspaceAnalysisToggle";
 import { DESKTOP_WORKSPACE_MEDIA, useMediaQuery } from "./hooks/useMediaQuery";
+import { useTutorial } from "./hooks/useTutorial";
 import { buildGeminiApiKeyHeaders } from "./lib/geminiApiKey";
 import { generateTopicQuestion } from "./lib/generateTopic";
 import {
@@ -56,6 +60,18 @@ export function App() {
   const isAnalysisMinimized = isDesktopWorkspace && analysisMinimized;
   const showAnalysisToggle = isDesktopWorkspace;
   const showAnalysisPanel = !isAnalysisMinimized;
+  const {
+    isOpen: isTutorialOpen,
+    stepIndex: tutorialStepIndex,
+    steps: tutorialSteps,
+    currentStep: tutorialCurrentStep,
+    showHint: showTutorialHint,
+    start: startTutorial,
+    next: nextTutorialStep,
+    prev: prevTutorialStep,
+    close: closeTutorial,
+    skip: skipTutorial
+  } = useTutorial();
 
   const handleTimeUp = useCallback(() => {
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
@@ -290,7 +306,7 @@ export function App() {
               <h1 className="site-bar__title">Band checker</h1>
             </div>
           </div>
-          <div className="site-bar__right">
+          <div className="site-bar__right" data-tour="header-settings">
             <FontFamilyMenu uiFontId={uiFontId} onSelectUiFont={selectUiFont} />
             <GeminiModelMenu
               geminiModelId={geminiModelId}
@@ -299,6 +315,22 @@ export function App() {
             />
             <ApiKeySettings />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            <Tooltip
+              align="end"
+              placement="bottom"
+              hintTrigger="auto"
+              content="How to use this tool"
+            >
+              <button
+                type="button"
+                className="site-bar__control site-bar__control--icon"
+                onClick={startTutorial}
+                aria-label="Open tutorial"
+              >
+                <HelpCircle size={18} strokeWidth={1.75} aria-hidden="true" />
+                {showTutorialHint ? <span className="tutorial-hint-ring" aria-hidden="true" /> : null}
+              </button>
+            </Tooltip>
           </div>
         </div>
       </header>
@@ -369,6 +401,16 @@ export function App() {
         </div>
       </div>
       <SiteFooter />
+      <TutorialTour
+        isOpen={isTutorialOpen}
+        step={tutorialCurrentStep}
+        stepIndex={tutorialStepIndex}
+        totalSteps={tutorialSteps.length}
+        onNext={nextTutorialStep}
+        onPrev={prevTutorialStep}
+        onSkip={skipTutorial}
+        onClose={closeTutorial}
+      />
     </div>
   );
 }

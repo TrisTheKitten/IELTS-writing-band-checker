@@ -83,6 +83,7 @@ export function CheckerForm({
         <div
           className={`input-box${isGeneratingTopic ? " input-box--generating" : ""}`}
           aria-busy={isGeneratingTopic}
+          data-tour="topic-input"
         >
           <div className="input-box__head">
             <label className="input-box__label" htmlFor="topic-input">
@@ -137,7 +138,7 @@ export function CheckerForm({
         </div>
       )}
 
-      <div className="input-box input-box--essay">
+      <div className="input-box input-box--essay" data-tour="essay-input">
         <div className="input-box__head">
           <label className="input-box__label" htmlFor="essay-input">
             Your answer
@@ -214,7 +215,7 @@ export function CheckerForm({
       ) : null}
 
       <div className="checker-form__actions">
-        <div className="checker-form__submit-group">
+        <div className="checker-form__submit-group" data-tour="check-button">
           <Button
             type="button"
             className="checker-form__submit"

@@ -24,7 +24,7 @@ export function ResultsPanel({
 
   if (!hasResult) {
     return (
-      <aside id="analysis-panel" className="analysis-sidebar" aria-label="Analysis">
+      <aside id="analysis-panel" className="analysis-sidebar" aria-label="Analysis" data-tour="analysis-panel">
         <header className="analysis-sidebar__head">
           <h2 className="analysis-sidebar__title">Analysis</h2>
         </header>
@@ -46,6 +46,7 @@ export function ResultsPanel({
       className={`analysis-sidebar ${animate ? "analysis-sidebar--animate" : ""}`}
       aria-label="Analysis"
       aria-live="polite"
+      data-tour="analysis-panel"
     >
       <header className="analysis-sidebar__head">
         <h2 className="analysis-sidebar__title">Analysis</h2>
@@ -56,6 +57,7 @@ export function ResultsPanel({
           className="analysis-sidebar__download"
           disabled={isPdfDownloading}
           onClick={onDownloadReportPdf}
+          data-tour="report-download"
         >
           Download report
         </Button>
