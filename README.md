@@ -4,7 +4,7 @@ Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Pas
 
 **Live app (bring your own key!):** [ielts-writing-band-checker.vercel.app](https://ielts-writing-band-checker.vercel.app/)
 
-> **Disclaimer:** Results are AI estimates only — not official IELTS scores.
+> **Disclaimer!:** Results are AI estimates only — not official IELTS scores.
 
 ## Features
 
