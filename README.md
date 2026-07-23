@@ -2,7 +2,7 @@
 
 Non-commercial, open-source IELTS Writing score checker inspired by Lexibot. Paste a prompt or upload a Task 1 question image, write your answer, look up words while you draft, and get estimated band scores with optional criteria feedback, corrections, and vocabulary suggestions.
 
-**Live app (bring your own key):** [ielts-writing-band-checker.vercel.app](https://ielts-writing-band-checker.vercel.app/)
+**Live app (bring your own key!):** [ielts-writing-band-checker.vercel.app](https://ielts-writing-band-checker.vercel.app/)
 
 > **Disclaimer:** Results are AI estimates only — not official IELTS scores.
 
