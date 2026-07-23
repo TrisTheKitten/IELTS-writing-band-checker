@@ -1,0 +1,384 @@
+.tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tutorial__spotlight-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.tutorial__spotlight-ring {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid color-mix(in srgb, var(--accent) 15%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 6%, transparent);
+  transition:
+    top var(--duration-mid) var(--ease-out),
+    left var(--duration-mid) var(--ease-out),
+    width var(--duration-mid) var(--ease-out),
+    height var(--duration-mid) var(--ease-out);
+}
+
+html[data-theme="dark"] .tutorial__spotlight-ring {
+  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.tutorial__card {
+  position: absolute;
+  z-index: 1;
+  pointer-events: auto;
+  width: min(26rem, calc(100vw - 2rem));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    0 4px 24px color-mix(in srgb, var(--text) 10%, transparent),
+    0 1px 3px color-mix(in srgb, var(--text) 6%, transparent);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--duration-mid) var(--ease-out),
+    transform var(--duration-mid) var(--ease-out),
+    top var(--duration-mid) var(--ease-out),
+    left var(--duration-mid) var(--ease-out);
+}
+
+.tutorial__card--ready {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tutorial__card--welcome {
+  width: min(28rem, calc(100vw - 2rem));
+}
+
+.tutorial__arrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.tutorial__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) 0;
+}
+
+.tutorial__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.tutorial__step-counter {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tutorial__progress-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.tutorial__progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width var(--duration-mid) var(--ease-out);
+}
+
+.tutorial__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.tutorial__close:hover {
+  color: var(--text);
+  background: var(--accent-subtle);
+}
+
+.tutorial__close:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.tutorial__card-body {
+  padding: var(--space-3) var(--space-5) var(--space-4);
+}
+
+.tutorial__title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.tutorial__card--welcome .tutorial__title {
+  font-size: 1.25rem;
+}
+
+.tutorial__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.tutorial__card-foot {
+  padding: 0 var(--space-5) var(--space-4);
+}
+
+.tutorial__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.tutorial__nav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.tutorial__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.tutorial__btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tutorial__btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.tutorial__btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(var(--control-hover-lift));
+  box-shadow: var(--control-hover-shadow);
+}
+
+html[data-theme="dark"] .tutorial__btn--primary:hover {
+  box-shadow: var(--control-hover-shadow-dark);
+}
+
+.tutorial__btn--secondary {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.tutorial__btn--secondary:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  transform: translateY(var(--control-hover-lift));
+  box-shadow: var(--control-hover-shadow);
+}
+
+html[data-theme="dark"] .tutorial__btn--secondary:hover:not(:disabled) {
+  box-shadow: var(--control-hover-shadow-dark);
+}
+
+.tutorial__skip {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.tutorial__skip:hover {
+  color: var(--text);
+}
+
+.tutorial__skip:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.tutorial__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 var(--space-5) var(--space-4);
+}
+
+.tutorial__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
+}
+
+.tutorial__dot--active {
+  background: var(--accent);
+  transform: scale(1.35);
+}
+
+.tutorial__dot--done {
+  background: var(--text-muted);
+}
+
+.tutorial-hint-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: tutorial-hint-pulse 2s var(--ease-out) infinite;
+}
+
+.site-bar__control--icon {
+  position: relative;
+  width: var(--site-bar-control-height);
+  padding: 0;
+}
+
+@keyframes tutorial-hint-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  30% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+:root {
+  --tutorial-backdrop: color-mix(in srgb, #1a1816 50%, transparent);
+}
+
+html[data-theme="dark"] {
+  --tutorial-backdrop: color-mix(in srgb, #000000 60%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial__card {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .tutorial__spotlight-ring {
+    transition: none;
+  }
+
+  .tutorial__progress-fill {
+    transition: none;
+  }
+
+  .tutorial__dot {
+    transition: none;
+  }
+
+  .tutorial-hint-ring {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .tutorial__card {
+    width: calc(100vw - 1.5rem);
+  }
+
+  .tutorial__card--welcome {
+    width: calc(100vw - 1.5rem);
+  }
+
+  .tutorial__card-head {
+    padding: var(--space-3) var(--space-4) 0;
+  }
+
+  .tutorial__card-body {
+    padding: var(--space-2) var(--space-4) var(--space-3);
+  }
+
+  .tutorial__card-foot {
+    padding: 0 var(--space-4) var(--space-3);
+  }
+
+  .tutorial__dots {
+    padding: 0 var(--space-4) var(--space-3);
+  }
+
+  .tutorial__title {
+    font-size: 1rem;
+  }
+
+  .tutorial__card--welcome .tutorial__title {
+    font-size: 1.125rem;
+  }
+
+  .tutorial__text {
+    font-size: 0.8125rem;
+  }
+}
